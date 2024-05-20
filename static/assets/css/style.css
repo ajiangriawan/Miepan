@@ -1,0 +1,129 @@
+* {
+  font-family: "Public Sans", sans-serif;
+}
+
+:root {
+  scroll-behavior: smooth;
+  --bs-white-a: #fefefe;
+  --bs-red-a: #d31a20;
+  --bs-yellow-a: #ff8a08;
+  --bs-black-a: #101010;
+  --bs-grey-a: #eeeeee;
+}
+
+body {
+  display: flex;
+  background-color: var(--bs-white-a);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+header {
+  width: 100%;
+  padding: 0 44px 0 44px;
+  background: linear-gradient(to bottom, #eeeeee 70%, #fefefe);
+}
+
+.btn-primary {
+  color: var(--bs-white-a);
+  background-color: var(--bs-red-a);
+  border-color: var(--bs-red-a);
+}
+
+.btn-primary:hover {
+  background-color: var(--bs-yellow-a);
+  border-color: var(--bs-yellow-a);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #ff8a08;
+  --bs-btn-border-color: #ff8a08;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #ff8a08;
+  --bs-btn-hover-border-color: #ff8a08;
+  --bs-btn-focus-shadow-rgb: 13, 110, 253;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #ff8a08;
+  --bs-btn-active-border-color: #ff8a08;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #ff8a08;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #ff8a08;
+  --bs-gradient: none;
+}
+
+.nav-pills .nav-link {
+  color: var(--bs-black-a);
+}
+
+.nav-link:hover {
+  color: var(--bs-red-a);
+}
+
+.nav-pills {
+  --bs-nav-pills-border-radius: var(--bs-border-radius);
+  --bs-nav-pills-link-active-color: var(--bs-red-a);
+  --bs-nav-pills-link-active-bg: var(--bs-grey-a);
+}
+
+.fs-4 {
+  color: var(--bs-red-a);
+  font-weight: bold;
+}
+
+.main-content {
+  width: 100%;
+  background-color: var(--bs-black-a);
+  color: var(--bs-white-a);
+}
+
+#img-content {
+  width: 200px;
+}
+
+.card-menu {
+  display: flex;
+}
+
+.geeks {
+  display: flex;
+  padding: 100px;
+  text-align: center;
+  justify-content: center;
+}
+
+#card-info {
+  background-color: var(--bs-red-a);
+  color: var(--bs-white-a);
+}
+
+section {
+  width: 100%;
+}
+
+.pattern {
+  position: relative;
+  background-color: var(--bs-black-a);
+  background-image: linear-gradient(315deg, var(--bs-black-a) 0%, var(--bs-black-a) 74%);
+}
+
+.pattern:before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 250px;
+  background: url(https://media.geeksforgeeks.org/wp-content/uploads/20200326181026/wave3.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+footer {
+  padding: 0 44px 0 44px;
+  width: 100%;
+  position: static;
+  bottom: 0;
+  background: linear-gradient(to top, #eeeeee 70%, #fefefe);
+}
