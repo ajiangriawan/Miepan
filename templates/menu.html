@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content%}
+
+<!-- ======= Main Content ======= -->
+<section class="pattern">
+    <div class="geeks">
+        <div class="container text-center mb-5">
+            <div class="search-box d-flex justify-content-center mb-5">
+                <input id="input-word" class="form-control" style="margin-right: 0.5rem" placeholder="cari disini" />
+                <button class="btn btn-primary" onclick="find_word()">Cari</button>
+            </div>
+            <div class="container text-center">
+                <h3 style="color: white;">Kategori</h3>
+                <br>
+            </div>
+            <div class="text-start d-flex flex-wrap flex-row grid gap-3 justify-content-between">
+                <a href="#">
+                    <div class="card text-center" style="width: 8rem;">
+                        <img src="../static/assets/img/k.jpg" class="card-img-top" alt="Spesial">
+                        <div class="card-body">
+                            <p class="card-text">Spesial</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="card text-center" style="width: 8rem;">
+                        <img src="../static/assets/img/o.jpg" class="card-img-top" alt="Spesial">
+                        <div class="card-body">
+                            <p class="card-text">Original</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="card text-center" style="width: 8rem;">
+                        <img src="../static/assets/img/m.jpg" class="card-img-top" alt="Spesial">
+                        <div class="card-body">
+                            <p class="card-text">Minuman</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="card text-center" style="width: 8rem;">
+                        <img src="../static/assets/img/c.jpg" class="card-img-top" alt="Spesial">
+                        <div class="card-body">
+                            <p class="card-text">Cemilan</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container text-center mt-5 mb-5">
+    <div class="container text-center">
+        <h3>Menu</h3>
+        <br>
+    </div>
+    <div class="text-start d-flex flex-wrap flex-row gap-5 align-items-center justify-content-center">
+        <a href="/detail_menu">
+            <div class="card" style="width: 18rem;">
+                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <div class="card-body">
+                    <div class="container text-start">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">Mie Bangladesh</h5>
+                                <i class="card-text">Mie nyemek basah</i>
+                                <p>Rp. 17.000,-</p>
+                                <p class="rating">
+                                    ⭐7.4
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col text-start d-flex justify-content-evenly">
+                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                                add_shopping_cart
+                            </a>
+                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="/detail_menu">
+            <div class="card" style="width: 18rem;">
+                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <div class="card-body">
+                    <div class="container text-start">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">Mie Bangladesh</h5>
+                                <i class="card-text">Mie nyemek basah</i>
+                                <p>Rp. 17.000,-</p>
+                                <p class="rating">
+                                    ⭐7.4
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col text-start d-flex justify-content-evenly">
+                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                                add_shopping_cart
+                            </a>
+                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="/detail_menu">
+            <div class="card" style="width: 18rem;">
+                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <div class="card-body">
+                    <div class="container text-start">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">Mie Bangladesh</h5>
+                                <i class="card-text">Mie nyemek basah</i>
+                                <p>Rp. 17.000,-</p>
+                                <p class="rating">
+                                    ⭐7.4
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col text-start d-flex justify-content-evenly">
+                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                                add_shopping_cart
+                            </a>
+                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="/detail_menu">
+            <div class="card" style="width: 18rem;">
+                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <div class="card-body">
+                    <div class="container text-start">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">Mie Bangladesh</h5>
+                                <i class="card-text">Mie nyemek basah</i>
+                                <p>Rp. 17.000,-</p>
+                                <p class="rating">
+                                    ⭐7.4
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col text-start d-flex justify-content-evenly">
+                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                                add_shopping_cart
+                            </a>
+                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="/detail_menu">
+            <div class="card" style="width: 18rem;">
+                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <div class="card-body">
+                    <div class="container text-start">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">Mie Bangladesh</h5>
+                                <i class="card-text">Mie nyemek basah</i>
+                                <p>Rp. 17.000,-</p>
+                                <p class="rating">
+                                    ⭐7.4
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col text-start d-flex justify-content-evenly">
+                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                                add_shopping_cart
+                            </a>
+                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="/detail_menu">
+            <div class="card" style="width: 18rem;">
+                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <div class="card-body">
+                    <div class="container text-start">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">Mie Bangladesh</h5>
+                                <i class="card-text">Mie nyemek basah</i>
+                                <p>Rp. 17.000,-</p>
+                                <p class="rating">
+                                    ⭐7.4
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col text-start d-flex justify-content-evenly">
+                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                                add_shopping_cart
+                            </a>
+                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+    </div>
+
+</div>
+<!-- ======= End of Main Content ======= -->
+
+{% endblock %}

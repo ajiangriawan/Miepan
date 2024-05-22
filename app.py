@@ -17,7 +17,25 @@ app = Flask(__name__)
 def home():
     return render_template("index.html")
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
 
+@app.route("/regis")
+def regis():
+    return render_template("register.html")
+
+@app.route("/menu")
+def menu():
+    return render_template("menu.html")
+
+@app.route("/detail_menu")
+def detailMenu():
+    return render_template("detail_menu.html")
+
+@app.route("/tentang")
+def tentang():
+    return render_template("tentang.html")
 
 
 if __name__ == "__main__":
