@@ -200,10 +200,58 @@ section {
   outline: none;
 }
 
+.card_detail{
+  border: 0;
+  width: 30rem;
+}
+
+.card-kategori {
+  width: 10rem;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  background-color: var(--bs-red-a);
+  color: var(--bs-white-a);
+}
+
+.card-kategori:hover{
+  color: var(--bs-black-a);
+}
+
+#kategori-img{
+  filter: blur();
+  border-radius: 150px;
+}
+
+#container-card{
+  justify-content: space-between;
+  align-items: center;
+}
+
 footer {
   padding: 0 44px 0 44px;
   width: 100%;
   position: static;
   bottom: 0;
   background: linear-gradient(to top, #eeeeee 70%, #fefefe);
+}
+
+@media (max-width: 500px) {
+  .card_detail {
+    width: 18rem;
+  }
+
+  .card-kategori {
+    width: 8rem;
+    font-size: small;
+  }
+
+  .geeks {
+    padding: 0;
+  }
+
+  #container-card{
+    justify-content: center;
+  }
+  
 }
