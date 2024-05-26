@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content%}
+
+<!-- ======= Main Content ======= -->
+<div class="container text-center mt-3 mb-5">
+    <div class="container text-start">
+        <h3>Checkout</h3>
+        <br>
+    </div>
+    <div class="text-center border p-2 rounded d-flex flex-row gap-1">
+        <div class="col-8 text-start mt-2 mb-2 d-flex flex-wrap grid gap-3" id="container-card">
+            <div class="card" style="width: 100%;">
+                <a href="/detail_menu" class="g-0 align-items-center d-flex flex-wrap text-start" id="card-keranjang">
+                    <div class="col-2">
+                        <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..."
+                            style="max-width: 70px;">
+                    </div>
+                    <div class="col-3 d-flex flex-wrap">Nama Pesanan</div>
+                    <div class="col-2 d-flex flex-wrap">Rp. 17.000</div>
+                    <div class="col-1 d-flex flex-wrap align-items-center">1</div>
+                    <div class="col-2 d-flex flex-wrap">Rp. 1.723.000</div>
+                </a>
+            </div>
+            <div class="card" style="width: 100%;">
+                <a href="/detail_menu" class="g-0 align-items-center d-flex flex-wrap text-start" id="card-keranjang">
+                    <div class="col-2">
+                        <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..."
+                            style="max-width: 70px;">
+                    </div>
+                    <div class="col-3 d-flex flex-wrap">Nama Pesanan</div>
+                    <div class="col-2 d-flex flex-wrap">Rp. 17.000</div>
+                    <div class="col-1 d-flex flex-wrap align-items-center">1</div>
+                    <div class="col-2 d-flex flex-wrap">Rp. 1.723.000</div>
+                </a>
+            </div>
+            <div class="card" style="width: 100%;">
+                <a href="/detail_menu" class="g-0 align-items-center d-flex flex-wrap text-start" id="card-keranjang">
+                    <div class="col-2">
+                        <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..."
+                            style="max-width: 70px;">
+                    </div>
+                    <div class="col-3 d-flex flex-wrap">Nama Pesanan</div>
+                    <div class="col-2 d-flex flex-wrap">Rp. 17.000</div>
+                    <div class="col-1 d-flex flex-wrap align-items-center">1</div>
+                    <div class="col-2 d-flex flex-wrap">Rp. 1.723.000</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-4 p-2 text-start mt-2 mb-2 d-flex flex-wrap grid gap-3 border" id="container-card">
+            <h3>Informasi Pemesanan</h3>
+            <select class="form-select" aria-label="Pilih Metode Pembayaran">
+                <option selected>Pilih Pembayaran</option>
+                <option value="1">BCA</option>
+                <option value="2">OVO</option>
+                <option value="3">Kasir</option>
+            </select>
+            <p>Nama Pemesan</p>
+            <h5>xxxxxxxxx</h5>
+            <p>Total Yang Harus Dibayarkan</p>
+            <h5>Rp. xxx.xxx</h5>
+            <div class="container text-center mt-2 mb-2">
+                <a href="/bayar" class="btn btn-primary">Bayar Sekarang</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ======= End of Main Content ======= -->
+
+{% endblock %}

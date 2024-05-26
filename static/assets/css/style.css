@@ -160,7 +160,7 @@ section {
 }
 
 .quantity .input-text.qty {
-  width: 80px;
+  width: 40px;
   height: 39px;
   padding: 0 5px;
   text-align: center;
@@ -187,7 +187,6 @@ section {
 .quantity.buttons_added .plus {
   padding: 7px 10px 8px;
   height: 41px;
-  width: 55px;
   color: var(--bs-white-a);
   background-color: var(--bs-red-a);
   border: 1px solid var(--bs-red-a);
@@ -241,6 +240,16 @@ section {
   align-items: center;
 }
 
+#card-keranjang {
+  flex-direction: row;
+  padding: 5px;
+}
+
+.form-check-input {
+  border-color: var(--bs-yellow-a);
+}
+
+
 footer {
   padding: 0 44px 0 44px;
   width: 100%;
@@ -252,6 +261,11 @@ footer {
 @media (max-width: 500px) {
   main{
     margin-top: 13rem;
+  }
+
+  #card-keranjang {
+    flex-direction: column;
+    align-content: flex-start;
   }
 
   .card_detail {

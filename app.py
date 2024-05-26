@@ -45,6 +45,14 @@ def pesanan():
 def bayar():
     return render_template("pembayaran.html")
 
+@app.route("/keranjang")
+def keranjang():
+    return render_template("keranjang.html")
+
+@app.route("/checkout")
+def checkout():
+    return render_template("checkout.html")
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=5000, debug=True)
