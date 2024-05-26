@@ -37,6 +37,14 @@ def detailMenu():
 def tentang():
     return render_template("tentang.html")
 
+@app.route("/pesanan")
+def pesanan():
+    return render_template("pesanan.html")
+
+@app.route("/bayar")
+def bayar():
+    return render_template("pembayaran.html")
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=5000, debug=True)

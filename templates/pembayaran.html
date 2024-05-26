@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content%}
+
+<!-- ======= Main Content ======= -->
+<div class="container d-flex flex-column text-center mt-3 mb-5 align-items-center justify-content-center">
+    <div class="container text-center">
+        <h3>Pembayaran</h3>
+        <br>
+    </div>
+    <div class="card border p-2" style="width: 80%;" data-status="belum-dibayar">
+        <div class="row g-0 align-items-center justify-content-center">
+            <div class="col-md-4">
+                <img src="../static/assets/img/barcode.png" class="img-fluid rounded-start" alt="barcode">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <div class="container text-center">
+                        <div class="row align-items-center justify-content-center text-start">
+                            <h5>Metode Pembayaran:</h5>
+                            <h2>xxxxxxxxx</h2>
+                            <h5>No Pesanan:</h5>
+                            <h2>xxxxxxxxx</h2>
+                            <h5>Nama Pemesan:</h5>
+                            <h2>xxxxxxxxx</h2>
+                            <h5>Total :</h5>
+                            <h2>Rp. xxxxxxxxx</h2>
+                            <input type="file" class="form-control mb-2 mt-2" id="inputGroupFile04"
+                                aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                            <button class="btn btn-primary" type="button" id="inputGroupFileAddon04">Kirim</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ======= End of Main Content ======= -->
+
+{% endblock %}

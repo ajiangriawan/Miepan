@@ -14,6 +14,7 @@ function wcqib_refresh_quantity_increments() {
         .after('<input type="button" value="+" class="plus" />');
   });
 }
+
 String.prototype.getDecimals ||
   (String.prototype.getDecimals = function () {
     var a = this,
@@ -46,3 +47,32 @@ String.prototype.getDecimals ||
         : b > 0 && a.val((b - parseFloat(e)).toFixed(e.getDecimals())),
       a.trigger("change");
   });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link#pesanan');
+    const cards = document.querySelectorAll('.card[data-status]');
+
+    function filterCards(status) {
+        cards.forEach(card => {
+            card.style.display = card.getAttribute('data-status') === status ? 'block' : 'none';
+        });
+    }
+
+    function handleNavClick(event) {
+        event.preventDefault();
+
+        navLinks.forEach(nav => nav.classList.remove('active'));
+        this.classList.add('active');
+
+        const status = this.getAttribute('data-status');
+        filterCards(status);
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', handleNavClick);
+    });
+
+    filterCards('belum-dibayar');
+});
+
