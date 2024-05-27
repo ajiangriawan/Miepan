@@ -53,6 +53,18 @@ def keranjang():
 def checkout():
     return render_template("checkout.html")
 
+@app.route("/profil")
+def profil():
+    return render_template("profil.html")
+
+@app.route("/editProfil")
+def editProfil():
+    return render_template("edit_profil.html")
+
+@app.route("/tambahMenu")
+def tambahMenu():
+    return render_template("tambah_menu.html")
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=5000, debug=True)
