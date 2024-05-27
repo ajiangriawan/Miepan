@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tambah Menu</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    .container {
+      width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tambah Menu</h1>
+
+    <label for="food-name">Nama Makanan:</label>
+    <input type="text" id="food-name" placeholder="Nama menu">
+
+    <label for="food-category">Kategori:</label>
+    <select id="food-category">
+      <option value="makanan">Makanan</option>
+      <option value="minuman">Minuman</option>
+    </select>
+
+    <label for="food-price">Harga:</label>
+    <input type="number" id="food-price" placeholder="Harga">
+
+    <label for="food-description">Deskripsi:</label>
+    <textarea id="food-description" placeholder="Deskripsi makanan"></textarea>
+
+    <button type="submit">Simpan</button>
+  </div>
+</body>
+</html>
