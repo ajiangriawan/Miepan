@@ -4,7 +4,7 @@
 Dashboard
 {% endblock %}
 
-{% block content%}
+{% block content %}
 
 <!-- ======= Main Content ======= -->
 <div class="container text-center mt-3 mb-5">
@@ -16,7 +16,8 @@ Dashboard
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="true" href="#" data-status="belum-dibayar" id="pesanan">Belum Dibayar</a>
+                    <a class="nav-link active" aria-current="true" href="#" data-status="belum-dibayar"
+                        id="pesanan">Belum Dibayar</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" data-status="proses" id="pesanan">Proses</a>
@@ -31,7 +32,8 @@ Dashboard
                 <div class="card" style="width: 100%;" data-status="belum-dibayar">
                     <div class="row g-0 align-items-center justify-content-start">
                         <div class="col-md-2">
-                            <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
+                            <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..."
+                                style="max-width: 70px;">
                         </div>
                         <div class="col-md-10">
                             <div class="card-body">
@@ -53,7 +55,8 @@ Dashboard
                 <div class="card" style="width: 100%;" data-status="proses">
                     <div class="row g-0 align-items-center justify-content-center">
                         <div class="col-md-2">
-                            <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
+                            <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..."
+                                style="max-width: 70px;">
                         </div>
                         <div class="col-md-10">
                             <div class="card-body">
@@ -73,7 +76,8 @@ Dashboard
                 <div class="card" style="width: 100%;" data-status="selesai">
                     <div class="row g-0 align-items-center justify-content-center">
                         <div class="col-md-2">
-                            <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
+                            <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="..."
+                                style="max-width: 70px;">
                         </div>
                         <div class="col-md-10">
                             <div class="card-body">
@@ -83,19 +87,65 @@ Dashboard
                                         <div class="col-md-3">Rp. Harga Satuan</div>
                                         <div class="col-md-1">1</div>
                                         <div class="col-md-3">Rp. Harga Total</div>
-                                        <div class="col-md-2"><i>Selesai</i></div>
+                                        <div class="col-md-2 d-flex justify-content-end">
+                                            <a href="#" class="btn btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#nilaiModal">Nilai</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
     </div>
 
 </div>
 <!-- ======= End of Main Content ======= -->
+
+<!-- Modal -->
+<div class="modal fade mt-5" id="nilaiModal" tabindex="-1" aria-labelledby="nilaiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="nilaiModalLabel">Beri Penilaian</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container text-center mb-5" style="width: 100%;">
+                    <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
+                        <h3>Nama Pesanan</h3>
+                        <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="name"
+                            style="width: 10rem;">
+                        <div class="text-start" style="width: 100%;">
+                            <p>Deskripsi</p>
+                            <p>Rp. xx.xxx</p>
+                            <p>No. Pesanan : xxxxxxx</p>
+                        </div>
+                        <div class="text-center mb-3">
+                            <i class="far fa-star star" data-value="1"></i>
+                            <i class="far fa-star star" data-value="2"></i>
+                            <i class="far fa-star star" data-value="3"></i>
+                            <i class="far fa-star star" data-value="4"></i>
+                            <i class="far fa-star star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" value="0">
+                        <div class="text-start mb-3" style="width: 100%;">
+                            <label for="inputReview" class="form-label">Tuliskan Komentar Anda</label>
+                            <textarea class="form-control" id="inputReview" rows="3"></textarea>
+                        </div>
+                        <div class="text-center" style="width: 100%;">
+                            <a href="#" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                                aria-label="Close">Batal</a>
+                            <a href="/kirimReview" class="btn btn-primary">Kirim</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

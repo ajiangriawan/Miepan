@@ -11,7 +11,8 @@
   --bs-grey-a: #eeeeee;
 }
 
-.nav-link, a {
+.nav-link,
+a {
   text-decoration: none;
   color: var(--bs-black-a);
 }
@@ -128,12 +129,11 @@ section {
   width: 100%;
 }
 
-#pat-index{
+#pat-index {
   margin-top: -1rem;
 }
 
 .pattern {
-
   position: relative;
   background-color: var(--bs-black-a);
   background-image: linear-gradient(
@@ -249,7 +249,11 @@ section {
   border-color: var(--bs-yellow-a);
 }
 
-
+.star {
+  font-size: 2rem;
+  color: var(--bs-yellow-a);
+  cursor: pointer;
+}
 
 footer {
   padding: 0 44px 0 44px;
@@ -260,7 +264,7 @@ footer {
 }
 
 @media (max-width: 500px) {
-  main{
+  main {
     margin-top: 13rem;
   }
 
