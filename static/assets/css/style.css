@@ -255,6 +255,18 @@ section {
   cursor: pointer;
 }
 
+#profil {
+  width: 50%;
+}
+
+#checkout-menu {
+  width: 55%;
+}
+
+#checkout-total {
+  width: 40%;
+}
+
 footer {
   padding: 0 44px 0 44px;
   width: 100%;
@@ -288,5 +300,13 @@ footer {
 
   #container-card {
     justify-content: center;
+  }
+
+  #profil {
+    width: 90%;
+  }
+
+  #checkout-total, #checkout-menu{
+    width: 100%;
   }
 }
