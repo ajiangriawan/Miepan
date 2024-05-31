@@ -5,7 +5,6 @@ Dashboard
 {% endblock %}
 
 {% block content%}
-
 <!-- ======= Main Content ======= -->
 <section class="pattern">
     <div class="geeks">
@@ -18,42 +17,35 @@ Dashboard
 </section>
 
 <div class="container text-center mb-5 border rounded" style="width: 50%;">
-    <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
-        <img src="../static/profile_pic/testimonials-2.jpg" class="img-fluid rounded-start" alt="name"
-            style="width: 10rem;">
-        <div class="text-start" style="width: 100%;">
-            <label for="formFileProfile" class="form-label">Maukan Foto Profil</label>
-            <input class="form-control" type="file" id="formFileProfile">
+    <form method="post" enctype="multipart/form-data">
+        <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
+            <img src="{{ user.fotoprofil }}" class="img-fluid rounded-start" alt="fotoprofil" style="width: 10rem;">
+            <div class="text-start" style="width: 100%;">
+                <label for="fotoprofil" class="form-label">Masukkan Foto Profil</label>
+                <input class="form-control" type="file" name="fotoprofil" id="fotoprofil">
+            </div>
+            <div class="text-start" style="width: 100%;">
+                <label for="nama" class="form-label">Nama</label>
+                <input class="form-control" id="nama" name="nama" type="text" value="{{ user.nama }}" required>
+            </div>
+            <div class="text-start" style="width: 100%;">
+                <label for="email" class="form-label">Email</label>
+                <input class="form-control" id="email" name="email" type="text" value="{{ user.email }}" required>
+            </div>
+            <div class="text-start" style="width: 100%;">
+                <label for="notlp" class="form-label">No Telepon</label>
+                <input class="form-control" id="notlp" name="notlp" type="text" value="{{ user.notlp }}">
+            </div>
+            <div class="text-start" style="width: 100%;">
+                <label for="alamat" class="form-label">Alamat</label>
+                <textarea class="form-control" id="alamat" name="alamat" rows="3">{{ user.alamat }}</textarea>
+            </div>
         </div>
-        <div class="text-start" style="width: 100%;">
-            <label for="inputNama" class="form-label">Nama</label>
-            <input class="form-control" id="inputNama" type="text" value="Nama Akun Yang Masuk"
-                aria-label="Disabled input example" required>
+        <div class="text-center mt-2" style="width: 100%;">
+            <a href="/profil" class="btn btn-outline-primary">Batal</a>
+            <button type="submit" class="btn btn-primary">Simpan</button>
         </div>
-        <div class="text-start" style="width: 100%;">
-            <label for="inputEmail" class="form-label">Email</label>
-            <input class="form-control" id="inputEmail" type="text" value="akun@gmail.com"
-                aria-label="Disabled input example" required>
-        </div>
-        <div class="text-start" style="width: 100%;">
-            <label for="inputNoTelepon" class="form-label">No Telepon</label>
-            <input class="form-control" id="inputNoTelepon" type="text" value="0878xxxxxx"
-                aria-label="Disabled input example">
-        </div>
-        <div class="text-start" style="width: 100%;">
-            <label for="inputAlamat" class="form-label">Alamat/label>
-            <textarea class="form-control" id="inputAlamat" rows="3">Jl. tempat tinggal akun yang sudah masuk</textarea>
-        </div>
-        <div class="text-center" style="width: 100%;">
-            <a href="/profil" class="btn btn-outline-primary">
-                Batal
-            </a>
-            <a href="/updateProfil" class="btn btn-primary">
-                simpan
-            </a>
-        </div>
-    </div>
-</div>
+    </form>
 </div>
 <!-- ======= End of Main Content ======= -->
 

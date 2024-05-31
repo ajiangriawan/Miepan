@@ -19,32 +19,32 @@ Dashboard
 
 <div class="container text-center mb-5 border rounded" id="profil">
     <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
-        <img src="../static/profile_pic/testimonials-2.jpg" class="img-fluid rounded-start" alt="name"
+        <img src="{{ user.fotoprofil }}" class="img-fluid rounded-start" alt="name"
             style="width: 10rem;">
         <div class="text-start" style="width: 100%;">
             <label for="inputNama" class="form-label">Nama</label>
-            <input class="form-control" id="inputNama" type="text" value="Nama Akun Yang Masuk" aria-label="Disabled input example"
+            <input class="form-control" id="inputNama" type="text" value="{{user.nama}}" aria-label="Disabled input example"
                 disabled readonly>
         </div>
         <div class="text-start" style="width: 100%;">
             <label for="inputEmail" class="form-label">Email</label>
-            <input class="form-control" id="inputEmail" type="text" value="akun@gmail.com" aria-label="Disabled input example"
+            <input class="form-control" id="inputEmail" type="text" value="{{user.email}}" aria-label="Disabled input example"
                 disabled readonly>
         </div>
         <div class="text-start" style="width: 100%;">
             <label for="inputNoTelepon" class="form-label">No Telepon</label>
-            <input class="form-control" id="inputNoTelepon" type="text" value="0878xxxxxx" aria-label="Disabled input example"
+            <input class="form-control" id="inputNoTelepon" type="text" value="{{user.notlp}}" aria-label="Disabled input example"
                 disabled readonly>
         </div>
         <div class="text-start" style="width: 100%;">
             <label for="inputAlamat" class="form-label">Alamat</label>
-            <textarea class="form-control" id="inputAlamat" rows="3" disabled readonly>Jl. tempat tinggal akun yang sudah masuk</textarea>
+            <textarea class="form-control" id="inputAlamat" rows="3" disabled readonly>{{user.alamat}}</textarea>
         </div>
         <div class="text-center" style="width: 100%;">
             <a href="/editProfil" class="btn btn-outline-primary">
                 Edit Akun
             </a>
-            <a href="/keluarProfil" class="btn btn-primary">
+            <a href="/logout" class="btn btn-primary">
                 Keluar
             </a>
         </div>

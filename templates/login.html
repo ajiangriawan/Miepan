@@ -20,30 +20,38 @@ Dashboard
                                     <img src="../static/assets/img/logo-miepan.png" style="width: 100px;" alt="logo">
                                     <h4 class="mt-1 mb-5 pb-1">Masuk Akun</h4>
                                 </div>
+                                {% with messages = get_flashed_messages(with_categories=True) %}
+                                {% if messages %}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}" role="alert">
+                                    {{ message }}
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                                {% endwith %}
 
-                                <form action="/profil" method="">
+                                <form method="post">
                                     <div data-mdb-input-init class="form-outline mb-4">
                                         <label class="form-label" for="form2Example11">Email</label>
                                         <input type="email" id="form2Example11" name="email" class="form-control"
-                                            placeholder="Masukin email kamu disini" />
+                                            placeholder="Masukin email kamu disini" required />
                                     </div>
 
                                     <div data-mdb-input-init class="form-outline mb-4">
                                         <label class="form-label" for="form2Example22">Kata Sandi</label>
                                         <input type="password" id="form2Example22" name="password" class="form-control"
-                                            placeholder="Masukin kata sandi disini" />
+                                            placeholder="Masukin kata sandi disini" required />
                                     </div>
                                     <div class="text-end mb-2">
                                         <a class="text-muted" href="#!">Lupa kata sandi?</a>
                                     </div>
                                     <div class="text-center pt-1 mb-5 pb-1">
-                                        <button class="btn btn-primary mb-3"
-                                            type="submit">Masuk</button>
+                                        <button class="btn btn-primary mb-3" type="submit">Masuk</button>
                                     </div>
 
                                     <div class="d-flex align-items-center justify-content-center pb-4">
                                         <p class="mb-0 me-2">Kamu tidak punya akun?</p>
-                                        <a href="/regis" class="btn btn-outline-danger">Buat Akun</a>
+                                        <a href="/regis" class="btn btn-outline-primary">Buat Akun</a>
                                     </div>
 
                                 </form>

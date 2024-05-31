@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename='logo-miepan.png') }}" type="image/x-icon" />
+    <meta property="og:title" content="Miepan" />
+    <meta property="og:description" content="Website Miepan" />
+    <meta property="og:image" content="{{ url_for('static', filename='logo-miepan.png') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap"
@@ -38,12 +42,11 @@
                         <span class="material-symbols-outlined">
                             shopping_cart
                         </span></a></li>
-                <li class="nav-item"><a href="/login" class="btn btn-primary">Akun</a></li>
+                <li class="nav-item"><a href="/profil" class="btn btn-primary">Akun</a></li>
             </ul>
         </div>
     </header>
     <main>
-
         {% block content %}
 
         {% endblock %}
