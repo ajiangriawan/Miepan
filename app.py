@@ -62,12 +62,42 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     return decorated
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.cookies.get('token')
+        if not token:
+            return redirect(url_for('login'))
+        try:
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
+            current_user = users_collection.find_one({'email': data['email']})
+            if current_user is None or current_user.get('role') != 'admin':
+                return redirect(url_for('login'))
+        except:
+            return redirect(url_for('login'))
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+def get_user_role():
+    token = request.cookies.get('token')
+    if token:
+        try:
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
+            user = users_collection.find_one({'email': data['email']})
+            if user:
+                return user.get('role', 'user')
+        except:
+            return 'user'
+    return 'user'
+
+@app.route('/')
+def index():
+    user_role = get_user_role()
+    return render_template('index.html', user_role=user_role)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    user_role = get_user_role()
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -84,10 +114,11 @@ def login():
         else:
             flash('Email atau Password salah', 'danger')
             return redirect(url_for('login'))
-    return render_template("login.html")
+    return render_template("login.html", user_role = user_role)
 
 @app.route("/regis", methods=['GET', 'POST'])
 def regis():
+    user_role = get_user_role()
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -106,7 +137,8 @@ def regis():
                 'nama': nama,
                 'notlp': 'silahkan edit profil',
                 'alamat': 'silahkan edit profil',
-                'fotoprofil': 'profil.png',
+                'fotoprofil': 'static/img/profil/profil.png',
+                'role': 'pelanggan',
             }
             users_collection.insert_one(user)
             flash('Pendaftaran berhasil', 'success')
@@ -114,7 +146,7 @@ def regis():
         else:
             flash('Password yang anda masukan tidak sama', 'danger')
             return redirect(url_for('regis'))
-    return render_template("register.html")
+    return render_template("register.html", user_role = user_role)
 
 @app.route('/logout')
 def logout():
@@ -124,40 +156,49 @@ def logout():
 
 @app.route("/menu")
 def menu():
-    return render_template("menu.html")
+    user_role = get_user_role()
+    return render_template("menu.html", user_role=user_role)
 
 @app.route("/detail_menu")
 def detailMenu():
-    return render_template("detail_menu.html")
+    user_role = get_user_role()
+    return render_template("detail_menu.html",user_role=user_role)
 
 @app.route("/tentang")
 def tentang():
-    return render_template("tentang.html")
+    user_role = get_user_role()
+    return render_template("tentang.html", user_role=user_role)
 
 @app.route("/pesanan")
 def pesanan():
-    return render_template("pesanan.html")
+    user_role = get_user_role()
+    return render_template("pesanan.html", user_role=user_role)
 
 @app.route("/bayar")
 def bayar():
-    return render_template("pembayaran.html")
+    user_role = get_user_role()
+    return render_template("pembayaran.html",user_role=user_role)
 
 @app.route("/keranjang")
 def keranjang():
-    return render_template("keranjang.html")
+    user_role = get_user_role()
+    return render_template("keranjang.html", user_role = user_role)
 
 @app.route("/checkout")
 def checkout():
-    return render_template("checkout.html")
+    user_role = get_user_role()
+    return render_template("checkout.html", user_role=user_role)
 
 @app.route("/profil")
 @token_required
 def profil(current_user):
-    return render_template("profil.html", user=current_user)
+    user_role = get_user_role()
+    return render_template("profil.html", user=current_user, user_role=user_role)
 
 @app.route("/editProfil", methods=['GET', 'POST'])
 @token_required
 def editProfil(current_user):
+    user_role = get_user_role()
     if request.method == 'POST':
         updated_user = {
             'nama': request.form['nama'],
@@ -178,27 +219,37 @@ def editProfil(current_user):
         flash('Profil berhasil diperbarui', 'success')
         return redirect(url_for('profil'))
 
-    return render_template("edit_profil.html", user=current_user)
+    return render_template("edit_profil.html", user=current_user, user_role=user_role)
 
 @app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html")
+@admin_required
+def dashboard(current_user):
+    user_role = get_user_role()
+    return render_template("dashboard.html", user_role=user_role)
 
 @app.route("/kelolaMenu")
-def kelolaMenu():
-    return render_template("kelola_menu.html")
+@admin_required
+def kelolaMenu(current_user):
+    user_role = get_user_role()
+    return render_template("kelola_menu.html", user_role=user_role)
 
 @app.route("/kelolaPesanan")
-def kelolaPesanan():
-    return render_template("kelola_pesanan.html")
+@admin_required
+def kelolaPesanan(current_user):
+    user_role = get_user_role()
+    return render_template("kelola_pesanan.html", user_role)
 
 @app.route("/kelolaRekening")
-def kelolaRekening():
-    return render_template("kelola_rekening.html")
+@admin_required
+def kelolaRekening(currentuser):
+    user_role = get_user_role()
+    return render_template("kelola_rekening.html", user_role)
 
 @app.route("/kelolaAdmin")
-def kelolaAdmin():
-    return render_template("kelola_admin.html")
+@admin_required
+def kelolaAdmin(current_user):
+    user_role = get_user_role()
+    return render_template("kelola_admin.html", user_role=user_role)
 
 @app.route('/sales_data')
 def sales_data():
