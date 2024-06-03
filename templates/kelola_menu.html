@@ -55,7 +55,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Menu Spesial</div>
                 <div class="card-body">
-                    <h5 class="card-title">12</h5>
+                    <h5 class="card-title">{{ count_per_category['Spesial'] }}</h5>
                 </div>
             </div>
         </div>
@@ -63,7 +63,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Menu Original</div>
                 <div class="card-body">
-                    <h5 class="card-title">13</h5>
+                    <h5 class="card-title">{{ count_per_category['Original'] }}</h5>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Menu Minuman</div>
                 <div class="card-body">
-                    <h5 class="card-title">1</h5>
+                    <h5 class="card-title">{{ count_per_category['Minuman'] }}</h5>
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Menu Cemilan</div>
                 <div class="card-body">
-                    <h5 class="card-title">123</h5>
+                    <h5 class="card-title">{{ count_per_category['Cemilan'] }}</h5>
                 </div>
             </div>
         </div>
@@ -102,26 +102,28 @@ Dashboard
         </div>
     </div>
     <div class="container border rounded">
-        <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card">
+        <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card ">
+            {% for menu in menus %}
             <div class="card" style="width: 100%;">
                 <div class="row g-0 align-items-center justify-content-start">
                     <div class="col-md-1">
-                        <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start ms-2" alt="..."
-                            style="max-width: 70px;">
+                        <img src="{{ menu['fotomenu'] }}" class="img-fluid rounded-start ms-2"
+                            alt="{{ menu['namamenu'] }}" style="max-width: 70px;">
                     </div>
                     <div class="col-md-11">
                         <div class="card-body">
                             <div class="container text-center">
                                 <div class="row align-items-center justify-content-center text-start">
-                                    <div class="col-md-3 d-flex justify-content-start">Mie Bangladesh</div>
-                                    <div class="col-md-3">Rp. 17.000</div>
-                                    <div class="col-md-3">Spesial</div>
+                                    <div class="col-md-3 d-flex justify-content-start">{{ menu['namamenu'] }}</div>
+                                    <div class="col-md-3">Rp. {{ menu['hargamenu'] }},-</div>
+                                    <div class="col-md-3">{{ menu['kategorimenu'] }}</div>
                                     <div class="col-md-2 d-flex justify-content-end">
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#editMenu"
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#editMenu{{ menu['_id'] }}"
                                             class="btn btn-outline-primary material-symbols-outlined">
                                             edit_square
                                         </a>
-                                        <a href="/hapusMenu" class="btn btn-primary material-symbols-outlined ms-2">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#hapusMenu{{ menu['_id'] }}"
+                                            class="btn btn-primary material-symbols-outlined ms-2">
                                             delete
                                         </a>
                                     </div>
@@ -131,62 +133,95 @@ Dashboard
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modal -->
-<div class="modal fade mt-5" id="editMenu" tabindex="-1" aria-labelledby="editMenuLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="editMenuLabel">Edit Menu</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container text-center mb-5" style="width: 100%;">
-                    <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
-                        <img src="../static/assets/img/k.jpg" class="img-fluid rounded-start" alt="name"
-                            style="width: 10rem;">
-                        <div class="mb-3" style="width: 100%;">
-                            <label for="formFile" class="form-label">Foto Menu</label>
-                            <input class="form-control" type="file" id="formFile">
+            <!-- Edit Menu Modal -->
+            <div class="modal fade mt-5" id="editMenu{{ menu['_id'] }}" tabindex="-1"
+                aria-labelledby="editMenuLabel{{ menu['_id'] }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="editMenuLabel{{ menu['_id'] }}">Edit Menu</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <select class="form-select" aria-label="Default select example">
-                            <option>Pilih Kategori</option>
-                            <option selected value="1">Spesial</option>
-                            <option value="2">Original</option>
-                            <option value="3">Minuman</option>
-                            <option value="3">Cemilan</option>
-                        </select>
-                        <div class="mb-3" style="width: 100%;">
-                            <label for="namaMenu" class="form-label">Nama Menu</label>
-                            <input type="text" class="form-control" id="namaMenu" placeholder="Nama Menu"
-                                value="Mie Bangladesh">
-                        </div>
-                        <div class="mb-3" style="width: 100%;">
-                            <label for="hargaMenu" class="form-label">Harga Menu</label>
-                            <input type="number" class="form-control" id="hargaMenu" placeholder="Harga Menu"
-                                value="17000">
-                        </div>
-                        <input type="hidden" id="rating" name="rating" value="0">
-                        <div class="text-start mb-3" style="width: 100%;">
-                            <label for="inputReview" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="inputReview" rows="3">Mie Nyemek</textarea>
-                        </div>
-                        <div class="text-center" style="width: 100%;">
-                            <a href="#" class="btn btn-outline-primary" data-bs-dismiss="modal"
-                                aria-label="Close">Batal</a>
-                            <a href="/updateMenu" class="btn btn-primary">Simpan</a>
+                        <div class="modal-body">
+                            <div class="container text-center mb-5" style="width: 100%;">
+                                <form action="/editMenu/{{ menu['_id'] }}" method="post" enctype="multipart/form-data">
+                                    <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-2"
+                                        id="container-card">
+                                        <div class="col-12">
+                                            <label for="namaMenu" class="form-label">Nama Menu</label>
+                                            <input type="text" name="namaMenu" class="form-control" id="namaMenu"
+                                                value="{{ menu['namamenu'] }}" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="hargaMenu" class="form-label">Harga Menu</label>
+                                            <input type="number" name="hargaMenu" class="form-control" id="hargaMenu"
+                                                value="{{ menu['hargamenu'] }}" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="deskripsiMenu" class="form-label">Deskripsi Menu</label>
+                                            <textarea name="deskripsiMenu" class="form-control" id="deskripsiMenu"
+                                                rows="3" required>{{ menu['deskripsimenu'] }}</textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="kategoriMenu" class="form-label">Kategori Menu</label>
+                                            <select name="kategoriMenu" class="form-control" id="kategoriMenu" required>
+                                                <option value="Spesial" {% if menu['kategorimenu']=='Spesial'
+                                                    %}selected{% endif %}>Spesial</option>
+                                                <option value="Original" {% if menu['kategorimenu']=='Original'
+                                                    %}selected{% endif %}>Original</option>
+                                                <option value="Minuman" {% if menu['kategorimenu']=='Minuman'
+                                                    %}selected{% endif %}>Minuman</option>
+                                                <option value="Cemilan" {% if menu['kategorimenu']=='Cemilan'
+                                                    %}selected{% endif %}>Cemilan</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="fotoMenu" class="form-label">Foto Menu</label>
+                                            <input type="file" name="fotoMenu" class="form-control" id="fotoMenu"
+                                                accept="image/*">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Hapus Menu Modal -->
+            <div class="modal fade mt-5" id="hapusMenu{{ menu['_id'] }}" tabindex="-1"
+                aria-labelledby="hapusMenuLabel{{ menu['_id'] }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="hapusMenuLabel{{ menu['_id'] }}">Hapus Menu</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container text-center mb-5" style="width: 100%;">
+                                <p>Apakah Anda yakin ingin menghapus menu <strong>{{ menu['namamenu'] }}</strong>?</p>
+                                <form action="/hapusMenu/{{ menu['_id'] }}" method="post">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-danger">Hapus</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Tambah Menu -->
 <div class="modal fade mt-5" id="tambahMenu" tabindex="-1" aria-labelledby="tambahMenuLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -196,39 +231,39 @@ Dashboard
             </div>
             <div class="modal-body">
                 <div class="container text-center mb-5" style="width: 100%;">
-                    <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
-                        <div class="mb-3" style="width: 100%;">
-                            <label for="formFile" class="form-label">Foto Menu</label>
-                            <input class="form-control" type="file" id="formFile">
+                    <form action="/tambahMenu" method="post" enctype="multipart/form-data">
+                        <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-2" id="container-card">
+                            <div class="col-12">
+                                <label for="namaMenu" class="form-label">Nama Menu</label>
+                                <input type="text" name="namaMenu" class="form-control" id="namaMenu" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="hargaMenu" class="form-label">Harga Menu</label>
+                                <input type="number" name="hargaMenu" class="form-control" id="hargaMenu" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="deskripsiMenu" class="form-label">Deskripsi Menu</label>
+                                <textarea name="deskripsiMenu" class="form-control" id="deskripsiMenu" rows="3"
+                                    required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label for="kategoriMenu" class="form-label">Kategori Menu</label>
+                                <select name="kategoriMenu" class="form-control" id="kategoriMenu" required>
+                                    <option value="Spesial">Spesial</option>
+                                    <option value="Original">Original</option>
+                                    <option value="Minuman">Minuman</option>
+                                    <option value="Cemilan">Cemilan</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="fotoMenu" class="form-label">Foto Menu</label>
+                                <input type="file" name="fotoMenu" class="form-control" id="fotoMenu" accept="image/*">
+                            </div>
                         </div>
-                        <select class="form-select" aria-label="Default select example">
-                            <option selected>Pilih Kategori</option>
-                            <option value="1">Spesial</option>
-                            <option value="2">Original</option>
-                            <option value="3">Minuman</option>
-                            <option value="3">Cemilan</option>
-                        </select>
-                        <div class="mb-3" style="width: 100%;">
-                            <label for="namaMenu" class="form-label">Nama Menu</label>
-                            <input type="text" class="form-control" id="namaMenu" placeholder="Nama Menu"
-                                value="">
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
-                        <div class="mb-3" style="width: 100%;">
-                            <label for="hargaMenu" class="form-label">Harga Menu</label>
-                            <input type="number" class="form-control" id="hargaMenu" placeholder="Harga Menu"
-                                value="">
-                        </div>
-                        <input type="hidden" id="rating" name="rating" value="0">
-                        <div class="text-start mb-3" style="width: 100%;">
-                            <label for="inputReview" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="inputReview" rows="3"></textarea>
-                        </div>
-                        <div class="text-center" style="width: 100%;">
-                            <a href="#" class="btn btn-outline-primary" data-bs-dismiss="modal"
-                                aria-label="Close">Batal</a>
-                            <a href="/saveMenu" class="btn btn-primary">Simpan</a>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>

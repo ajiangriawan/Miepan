@@ -55,7 +55,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Penjualan</div>
                 <div class="card-body">
-                    <h5 class="card-title">12</h5>
+                    <h5 class="card-title">{{ total_sales }}</h5>
                 </div>
             </div>
         </div>
@@ -63,7 +63,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Menu</div>
                 <div class="card-body">
-                    <h5 class="card-title">13</h5>
+                    <h5 class="card-title">{{ total_menus }}</h5>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Admin</div>
                 <div class="card-body">
-                    <h5 class="card-title">1</h5>
+                    <h5 class="card-title">{{ count_per_role['admin'] }}</h5>
                 </div>
             </div>
         </div>
@@ -79,12 +79,12 @@ Dashboard
             <div class="card mb-3" style="width: 12rem;" id="card-info">
                 <div class="card-header">Total Pengguna</div>
                 <div class="card-body">
-                    <h5 class="card-title">123</h5>
+                    <h5 class="card-title">{{ count_per_role['pelanggan'] }}</h5>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container mt-5">
+    <div class="container mt-3">
         <h2 class="text-center">Grafik Penjualan</h2>
         <div class="text-center mb-3">
             <button class="btn btn-primary" onclick="updateChart('weekly')">Mingguan</button>
