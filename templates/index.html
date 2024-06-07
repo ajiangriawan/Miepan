@@ -18,7 +18,7 @@ Dashboard
                 <div class="search-box d-flex justify-content-center">
                     <input id="input-word" class="form-control" style="margin-right: 0.5rem"
                         placeholder="cari disini" />
-                    <button class="btn btn-primary" onclick="find_word()">Cari</button>
+                    <button class="btn btn-primary" onclick="find_menuhome()">Cari</button>
                 </div>
             </div>
             <div class="col">
@@ -59,87 +59,41 @@ Dashboard
         <br>
     </div>
     <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card">
-        <div class="card" style="width: 16rem;">
-            <a href="/detail_menu">
-                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
-                <div class="card-body">
-                    <div class="container text-start">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="card-title">Mie Bangladesh</h5>
-                                <i class="card-text">Mie nyemek basah</i>
-                                <p>Rp. 17.000,-</p>
-                                <p class="rating">
-                                    ⭐7.4
-                                </p>
+        {% for menu in menus %}
+        <div class="col p-0 menu-card" style="max-width: 14rem;">
+            <a href="/detail_menu/{{ menu['_id'] }}" class="p-0">
+                <div class="card h-100 menu-card">
+                    <div class="d-flex align-items-center justify-content-center p-2" style="width: 100%;">
+                        <img src="{{menu['fotomenu']}}" class="card-img-top" alt="menu" style="width: 50%">
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="container text-start">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title">{{menu['namamenu']}}</h5>
+                                    <p>Rp. {{menu['hargamenu']}},-</p>
+                                    <p class="rating">
+                                        ⭐7.4
+                                    </p>
+                                </div>
                             </div>
-
-                        </div>
-                        <div class="col text-start d-flex justify-content-evenly">
-                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
-                                add_shopping_cart
-                            </a>
-                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                            <div class="col text-start d-flex justify-content-evenly mb-3">
+                                <form action="/keranjang/{{ menu['_id'] }}" method="post">
+                                    <button type="submit" class="btn btn-outline-primary material-symbols-outlined">
+                                        add_shopping_cart
+                                    </button>
+                                </form>
+                                <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </a>
         </div>
-        <div class="card" style="width: 16rem;">
-            <a href="/detail_menu">
-                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
-                <div class="card-body">
-                    <div class="container text-start">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="card-title">Mie Bangladesh</h5>
-                                <i class="card-text">Mie nyemek basah</i>
-                                <p>Rp. 17.000,-</p>
-                                <p class="rating">
-                                    ⭐7.4
-                                </p>
-                            </div>
-
-                        </div>
-                        <div class="col text-start d-flex justify-content-evenly">
-                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
-                                add_shopping_cart
-                            </a>
-                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="card" style="width: 16rem;">
-            <a href="/detail_menu">
-                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
-                <div class="card-body">
-                    <div class="container text-start">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="card-title">Mie Bangladesh</h5>
-                                <i class="card-text">Mie nyemek basah</i>
-                                <p>Rp. 17.000,-</p>
-                                <p class="rating">
-                                    ⭐7.4
-                                </p>
-                            </div>
-
-                        </div>
-                        <div class="col text-start d-flex justify-content-evenly">
-                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
-                                add_shopping_cart
-                            </a>
-                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
+        {% endfor %}
     </div>
     <div class="container text-center mt-5">
-        <a href="#" class="btn btn-primary">Lihat Menu Lainnya</a>
+        <a href="/menu" class="btn btn-primary">Lihat Menu Lainnya</a>
     </div>
 </div>
 <div class="container text-center mt-3 mb-5">

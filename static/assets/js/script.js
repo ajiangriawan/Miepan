@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           data: [],
           backgroundColor: "#eeeeee",
           borderColor: "#d31a20",
-          borderWidth: 1, 
+          borderWidth: 1,
           fill: true,
         },
       ],
@@ -172,3 +172,64 @@ document.addEventListener("DOMContentLoaded", (event) => {
   // Load initial data for weekly view
   fetchData("weekly");
 });
+
+function filterCategory(category) {
+  let cards = document.querySelectorAll(".menu-card");
+  cards.forEach((card) => {
+    if (category === "All" || card.getAttribute("data-category") === category) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+}
+
+function filterMenu(category) {
+  window.location.href = '/menu?category=' + category;
+}
+
+function find_word() {
+  let input = document.getElementById("input-word").value.toLowerCase();
+  let cards = document.querySelectorAll(".menu-card");
+  cards.forEach((card) => {
+    let name = card
+      .querySelector(".col-md-3.d-flex.justify-content-start")
+      .textContent.toLowerCase();
+    if (name.includes(input)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+}
+
+function find_menu() {
+  var input = document.getElementById('input-word').value.toLowerCase();
+  var cards = document.getElementsByClassName('menu-card');
+
+  for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var title = card.getElementsByClassName('card-title')[0].innerText.toLowerCase();
+      if (title.includes(input)) {
+          card.parentElement.style.display = "";
+      } else {
+          card.parentElement.style.display = "none";
+      }
+  }
+}
+
+function find_menuhome() {
+  var input = document.getElementById('input-word').value;
+  if (input) {
+      window.location.href = `/menu?search=${encodeURIComponent(input)}`;
+  }
+}
+
+window.onload = function() {
+  const params = new URLSearchParams(window.location.search);
+  const searchQuery = params.get('search');
+  if (searchQuery) {
+      document.getElementById('input-word').value = searchQuery;
+      find_menu();
+  }
+}

@@ -9,6 +9,10 @@
   --bs-yellow-a: #ff8a08;
   --bs-black-a: #1a1a1a;
   --bs-grey-a: #eeeeee;
+  --bs-nav-link-color: #ff8a08;
+  --bs-blue:#ff8a08;
+  --bs-link-color:#ff8a08;
+  --bs-link-hover-color:#ff8a08;
 }
 
 .nav-link,
@@ -125,6 +129,10 @@ header {
   color: var(--bs-white-a);
 }
 
+.form-control {
+  border: solid 1px var(--bs-red-a);
+}
+
 section {
   width: 100%;
 }
@@ -232,7 +240,7 @@ section {
 
 #kategori-img {
   filter: blur();
-  border-radius: 150px;
+  width: 80px;
 }
 
 #container-card {

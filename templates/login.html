@@ -18,7 +18,7 @@ Dashboard
 
                                 <div class="text-center">
                                     <img src="../static/assets/img/logo-miepan.png" style="width: 100px;" alt="logo">
-                                    <h4 class="mt-1 mb-5 pb-1">Masuk Akun</h4>
+                                    <h4 class="mt-1 mb-3 pb-1">Masuk Akun</h4>
                                 </div>
                                 {% with messages = get_flashed_messages(with_categories=True) %}
                                 {% if messages %}
@@ -31,7 +31,7 @@ Dashboard
                                 {% endwith %}
 
                                 <form method="post">
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div data-mdb-input-init class="form-outline mb-2">
                                         <label class="form-label" for="form2Example11">Email</label>
                                         <input type="email" id="form2Example11" name="email" class="form-control"
                                             placeholder="Masukin email kamu disini" required />
@@ -42,7 +42,7 @@ Dashboard
                                         <input type="password" id="form2Example22" name="password" class="form-control"
                                             placeholder="Masukin kata sandi disini" required />
                                     </div>
-                                    <div class="text-end mb-2">
+                                    <div class="text-end mb-4">
                                         <a class="text-muted" href="#!">Lupa kata sandi?</a>
                                     </div>
                                     <div class="text-center pt-1 mb-5 pb-1">
@@ -58,7 +58,7 @@ Dashboard
 
                             </div>
                         </div>
-                        <div class="col-lg-6 d-flex align-items-center bg-black">
+                        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-black">
                             <div class="text-white px-3 py-4 p-md-5 mx-md-4">
                                 <div class="d-flex align-items-center justify-content-center">
                                     <img src="../static/assets/img/login.png" alt="login" id="img-content">

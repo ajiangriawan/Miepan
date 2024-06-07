@@ -13,10 +13,9 @@ Dashboard
             aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-primary" type="submit">Search</button>
-        </form>
+        <div class="text-center" style="width: 100%;">
+            <h3>Dashboard</h3>
+        </div>
         <div class="offcanvas offcanvas-start mt-5" tabindex="-1" id="offcanvasDarkNavbar"
             aria-labelledby="offcanvasDarkNavbarLabel">
             <div class="offcanvas-header mt-5">
@@ -46,10 +45,6 @@ Dashboard
     </div>
 </nav>
 <div class="container text-center mt-3 mb-5">
-    <div class="container text-start">
-        <h3>Dashboard</h3>
-        <br>
-    </div>
     <div class="row" style="width: 100%;">
         <div class="col d-flex justify-content-center text-start">
             <div class="card mb-3" style="width: 12rem;" id="card-info">
@@ -85,7 +80,7 @@ Dashboard
         </div>
     </div>
     <div class="container mt-3">
-        <h2 class="text-center">Grafik Penjualan</h2>
+        <h4 class="text-center">Grafik Penjualan</h4>
         <div class="text-center mb-3">
             <button class="btn btn-primary" onclick="updateChart('weekly')">Mingguan</button>
             <button class="btn btn-primary" onclick="updateChart('monthly')">Bulanan</button>

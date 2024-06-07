@@ -13,16 +13,18 @@ Dashboard
         <br>
     </div>
     <div class="d-flex flex-wrap flex-row gap-5 justify-content-center">
-        <div class="d-flex text-center flex-wrap align-items-center justify-content-center flex-column border">
-            <div class="card card_detail">
-                <h2 class="card-title">Mie Bangladesh</h2>
-                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+        <div class="d-flex text-center flex-wrap align-items-center justify-content-start flex-column border">
+            <div class="card card_detail mt-5">
+                <h2 class="card-title">{{menu['namamenu']}}</h2>
+                <div class="d-flex justify-content-center">
+                    <img src="../{{menu['fotomenu']}}" class="card-img-top" alt="menu" style="width: 60%;">
+                </div>
                 <div class="card-body">
                     <div class="container text-start">
                         <div class="row">
                             <div class="col">
-                                <i class="card-text">Mie nyemek basah</i>
-                                <p>Rp. 17.000,-</p>
+                                <i class="card-text">{{menu['deskripsimenu']}}</i>
+                                <p>Rp. {{menu['hargamenu']}},-</p>
                                 <p class="rating">
                                     ⭐7.4
                                 </p>
@@ -45,54 +47,34 @@ Dashboard
         </div>
         <div class="d-flex flex-wrap align-items-center flex-column gap-2 ">
             <h4>Menu Lainnya</h4>
+            {% if different_category_menu %}
             <div class="card" style="width: 18rem;">
-                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
+                <img src="../{{ different_category_menu['fotomenu'] }}" class="card-img-top" alt="menu">
                 <div class="card-body">
                     <div class="container text-start">
                         <div class="row">
                             <div class="col">
-                                <h5 class="card-title">Mie Bangladesh</h5>
-                                <i class="card-text">Mie nyemek basah</i>
-                                <p>Rp. 17.000,-</p>
+                                <h5 class="card-title">{{ different_category_menu['namamenu'] }}</h5>
+                                <i class="card-text">{{ different_category_menu['deskripsimenu'] }}</i>
+                                <p>Rp. {{ different_category_menu['hargamenu'] }},-</p>
                                 <p class="rating">
                                     ⭐7.4
                                 </p>
                             </div>
-
                         </div>
                         <div class="col text-start d-flex justify-content-evenly">
-                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
+                            <a href="{{ url_for('detailMenu', menu_id=different_category_menu['_id']) }}" class="btn btn-outline-primary material-symbols-outlined">
                                 add_shopping_cart
                             </a>
-                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                            <a href="{{ url_for('detailMenu', menu_id=different_category_menu['_id']) }}" class="btn btn-primary">Beli Sekarang</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card" style="width: 18rem;">
-                <img src="../static/assets/img/k.jpg" class="card-img-top" alt="menu">
-                <div class="card-body">
-                    <div class="container text-start">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="card-title">Mie Bangladesh</h5>
-                                <i class="card-text">Mie nyemek basah</i>
-                                <p>Rp. 17.000,-</p>
-                                <p class="rating">
-                                    ⭐7.4
-                                </p>
-                            </div>
-
-                        </div>
-                        <div class="col text-start d-flex justify-content-evenly">
-                            <a href="#" class="btn btn-outline-primary material-symbols-outlined">
-                                add_shopping_cart
-                            </a>
-                            <a href="#" class="btn btn-primary">Beli Sekarang</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <a href="/menu" class="btn btn-primary">Lihat Menu Lainnya</a>
+            {% else %}
+            <p>Tidak ada menu lain yang tersedia dari kategori yang berbeda.</p>
+            {% endif %}
         </div>
     </div>
 </div>

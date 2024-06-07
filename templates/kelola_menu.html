@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Dashboard
+Kelola Menu
 {% endblock %}
 
 {% block content %}
@@ -13,10 +13,9 @@ Dashboard
             aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-primary" type="submit">Search</button>
-        </form>
+        <div class="text-center" style="width: 100%;">
+            <h3>Kelola Menu</h3>
+        </div>
         <div class="offcanvas offcanvas-start mt-5" tabindex="-1" id="offcanvasDarkNavbar"
             aria-labelledby="offcanvasDarkNavbarLabel">
             <div class="offcanvas-header mt-5">
@@ -47,8 +46,15 @@ Dashboard
 </nav>
 <div class="container text-center mt-3 mb-5">
     <div class="container text-start">
-        <h3>Kelola Menu</h3>
-        <br>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
     <div class="row" style="width: 100%;">
         <div class="col d-flex justify-content-center text-start">
@@ -85,7 +91,7 @@ Dashboard
         </div>
     </div>
     <div class="container text-start mt-2">
-        <h3>Daftar Menu</h3>
+        <h4>Daftar Menu</h4>
         <br>
         <div class="row g-2" style="width: 100%;">
             <div class="col-2">
@@ -94,8 +100,8 @@ Dashboard
             </div>
             <div class="col-10">
                 <div class="search-box d-flex justify-content-center mb-2">
-                    <input id="input-word" class="form-control" style="margin-right: 0.5rem"
-                        placeholder="cari disini" />
+                    <input id="input-word" class="form-control" style="margin-right: 0.5rem" placeholder="cari disini"
+                        oninput="find_word()" />
                     <button class="btn btn-primary" onclick="find_word()">Cari</button>
                 </div>
             </div>
@@ -103,8 +109,27 @@ Dashboard
     </div>
     <div class="container border rounded">
         <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card ">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link active" onclick="filterCategory('All')">Semua</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" onclick="filterCategory('Spesial')">Spesial</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" onclick="filterCategory('Original')">Original</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" onclick="filterCategory('Minuman')">Minuman</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" onclick="filterCategory('Cemilan')">Cemilan</button>
+                    </li>
+                </ul>
+            </div>
             {% for menu in menus %}
-            <div class="card" style="width: 100%;">
+            <div class="card menu-card" style="width: 100%;" data-category="{{ menu['kategorimenu'] }}">
                 <div class="row g-0 align-items-center justify-content-start">
                     <div class="col-md-1">
                         <img src="{{ menu['fotomenu'] }}" class="img-fluid rounded-start ms-2"
@@ -154,16 +179,6 @@ Dashboard
                                                 value="{{ menu['namamenu'] }}" required>
                                         </div>
                                         <div class="col-12">
-                                            <label for="hargaMenu" class="form-label">Harga Menu</label>
-                                            <input type="number" name="hargaMenu" class="form-control" id="hargaMenu"
-                                                value="{{ menu['hargamenu'] }}" required>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="deskripsiMenu" class="form-label">Deskripsi Menu</label>
-                                            <textarea name="deskripsiMenu" class="form-control" id="deskripsiMenu"
-                                                rows="3" required>{{ menu['deskripsimenu'] }}</textarea>
-                                        </div>
-                                        <div class="col-12">
                                             <label for="kategoriMenu" class="form-label">Kategori Menu</label>
                                             <select name="kategoriMenu" class="form-control" id="kategoriMenu" required>
                                                 <option value="Spesial" {% if menu['kategorimenu']=='Spesial'
@@ -180,6 +195,16 @@ Dashboard
                                             <label for="fotoMenu" class="form-label">Foto Menu</label>
                                             <input type="file" name="fotoMenu" class="form-control" id="fotoMenu"
                                                 accept="image/*">
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="hargaMenu" class="form-label">Harga Menu</label>
+                                            <input type="number" name="hargaMenu" class="form-control" id="hargaMenu"
+                                                value="{{ menu['hargamenu'] }}" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="deskripsiMenu" class="form-label">Deskripsi Menu</label>
+                                            <textarea name="deskripsiMenu" class="form-control" id="deskripsiMenu"
+                                                rows="3" required>{{ menu['deskripsimenu'] }}</textarea>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -238,15 +263,6 @@ Dashboard
                                 <input type="text" name="namaMenu" class="form-control" id="namaMenu" required>
                             </div>
                             <div class="col-12">
-                                <label for="hargaMenu" class="form-label">Harga Menu</label>
-                                <input type="number" name="hargaMenu" class="form-control" id="hargaMenu" required>
-                            </div>
-                            <div class="col-12">
-                                <label for="deskripsiMenu" class="form-label">Deskripsi Menu</label>
-                                <textarea name="deskripsiMenu" class="form-control" id="deskripsiMenu" rows="3"
-                                    required></textarea>
-                            </div>
-                            <div class="col-12">
                                 <label for="kategoriMenu" class="form-label">Kategori Menu</label>
                                 <select name="kategoriMenu" class="form-control" id="kategoriMenu" required>
                                     <option value="Spesial">Spesial</option>
@@ -258,6 +274,15 @@ Dashboard
                             <div class="col-12">
                                 <label for="fotoMenu" class="form-label">Foto Menu</label>
                                 <input type="file" name="fotoMenu" class="form-control" id="fotoMenu" accept="image/*">
+                            </div>
+                            <div class="col-12">
+                                <label for="hargaMenu" class="form-label">Harga Menu</label>
+                                <input type="number" name="hargaMenu" class="form-control" id="hargaMenu" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="deskripsiMenu" class="form-label">Deskripsi Menu</label>
+                                <textarea name="deskripsiMenu" class="form-control" id="deskripsiMenu" rows="3"
+                                    required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">

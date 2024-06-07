@@ -12,12 +12,14 @@ import random
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+# Load environment variables
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 
+# Directories for image uploads
 UPLOAD_FOLDER = 'static/img/profil'
 MENU_FOLDER = 'static/img/menu'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -25,14 +27,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MENU_FOLDER'] = MENU_FOLDER
 
 # Create upload directories if they don't exist
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
-if not os.path.exists(app.config['MENU_FOLDER']):
-    os.makedirs(app.config['MENU_FOLDER'])
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['MENU_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# MongoDB connection
 MONGODB_CONNECTION_STRING = os.environ.get("CONNECTION")
 DB_NAME = os.environ.get("DATABASE_NAME")
 JWT_SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -43,6 +44,8 @@ jobs_collection = db.jobs
 users_collection = db.users
 menus_collection = db.menus
 sales_collection = db.sales
+categories_collection = db.categories
+carts_collection = db.carts
 
 def generate_fake_sales_data(num_days):
     sales_data = []
@@ -64,7 +67,9 @@ def token_required(f):
             current_user = users_collection.find_one({'email': data['email']})
             if current_user is None:
                 return redirect(url_for('login'))
-        except:
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for('login'))
+        except jwt.InvalidTokenError:
             return redirect(url_for('login'))
         return f(current_user, *args, **kwargs)
     return decorated
@@ -80,7 +85,9 @@ def admin_required(f):
             current_user = users_collection.find_one({'email': data['email']})
             if current_user is None or current_user.get('role') != 'admin':
                 return redirect(url_for('login'))
-        except:
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for('login'))
+        except jwt.InvalidTokenError:
             return redirect(url_for('login'))
         return f(current_user, *args, **kwargs)
     return decorated
@@ -99,8 +106,10 @@ def get_user_role():
 
 @app.route('/')
 def index():
+    menus = menus_collection.find().limit(3)
+    menu_list = list(menus)
     user_role = get_user_role()
-    return render_template('index.html', user_role=user_role)
+    return render_template('index.html', user_role=user_role, menus=menu_list)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -121,7 +130,7 @@ def login():
         else:
             flash('Email atau Password salah', 'danger')
             return redirect(url_for('login'))
-    return render_template("login.html", user_role = user_role)
+    return render_template("login.html", user_role=user_role)
 
 @app.route("/regis", methods=['GET', 'POST'])
 def regis():
@@ -135,7 +144,7 @@ def regis():
 
         if password == passwordver:
             if users_collection.find_one({'email': email}):
-                flash('email sudah terdaftar', 'danger')
+                flash('Email sudah terdaftar', 'danger')
                 return redirect(url_for('regis'))
 
             user = {
@@ -153,9 +162,10 @@ def regis():
         else:
             flash('Password yang anda masukan tidak sama', 'danger')
             return redirect(url_for('regis'))
-    return render_template("register.html", user_role = user_role)
+    return render_template("register.html", user_role=user_role)
 
 @app.route('/logout')
+@token_required
 def logout():
     resp = redirect(url_for('login'))
     resp.delete_cookie('token')
@@ -163,13 +173,38 @@ def logout():
 
 @app.route("/menu")
 def menu():
+    category = request.args.get('category')
+    if category:
+        menus = menus_collection.find({'kategorimenu': category})
+    else:
+        menus = menus_collection.find()
+    menu_list = list(menus)
     user_role = get_user_role()
-    return render_template("menu.html", user_role=user_role)
 
-@app.route("/detail_menu")
-def detailMenu():
+    categories = list(categories_collection.find())  # Get categories from the categories collection
+    return render_template("menu.html", user_role=user_role, menus=menu_list, categories=categories)
+
+@app.route("/detail_menu/<menu_id>", methods=['GET', 'POST'])
+def detailMenu(menu_id):
     user_role = get_user_role()
-    return render_template("detail_menu.html",user_role=user_role)
+    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
+    
+    if menu:
+        # Find a random menu item from a different category
+        different_category_menu = menus_collection.aggregate([
+            {"$match": {"kategorimenu": {"$ne": menu['kategorimenu']}}},
+            {"$sample": {"size": 1}}
+        ])
+        different_category_menu = list(different_category_menu)  # convert cursor to list
+        if different_category_menu:
+            different_category_menu = different_category_menu[0]
+        else:
+            different_category_menu = None  # Handle case where no other categories are available
+    else:
+        different_category_menu = None
+    
+    return render_template("detail_menu.html", user_role=user_role, menu=menu, different_category_menu=different_category_menu)
+
 
 @app.route("/tentang")
 def tentang():
@@ -177,24 +212,48 @@ def tentang():
     return render_template("tentang.html", user_role=user_role)
 
 @app.route("/pesanan")
-def pesanan():
+@token_required
+def pesanan(current_user):
     user_role = get_user_role()
-    return render_template("pesanan.html", user_role=user_role)
+    return render_template("pesanan.html", user=current_user, user_role=user_role)
 
 @app.route("/bayar")
-def bayar():
+@token_required
+def bayar(current_user):
     user_role = get_user_role()
-    return render_template("pembayaran.html",user_role=user_role)
+    return render_template("pembayaran.html", user=current_user, user_role=user_role)
 
 @app.route("/keranjang")
-def keranjang():
+@token_required
+def keranjang(current_user):
     user_role = get_user_role()
-    return render_template("keranjang.html", user_role = user_role)
+    return render_template("keranjang.html", user=current_user, user_role=user_role)
+
+@app.route('/keranjang/<menu_id>', methods=['POST'])
+@token_required
+def add_to_cart(current_user, menu_id):
+    user_role = get_user_role()
+    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
+    if menu:
+        cart_item = {
+            'user_id': current_user['_id'],
+            'menu_id': menu['_id'],
+            'quantity': 1,
+            'namamenu': menu['namamenu'],
+            'hargamenu': menu['hargamenu'],
+            'fotomenu': menu['fotomenu']
+        }
+        carts_collection.insert_one(cart_item)
+        flash('Menu ditambahkan ke keranjang', 'success')
+    else:
+        flash('Menu tidak ditemukan', 'danger')
+    return redirect(url_for('index'))
 
 @app.route("/checkout")
-def checkout():
+@token_required
+def checkout(current_user):
     user_role = get_user_role()
-    return render_template("checkout.html", user_role=user_role)
+    return render_template("checkout.html", user=current_user, user_role=user_role)
 
 @app.route("/profil")
 @token_required
@@ -236,54 +295,46 @@ def dashboard(current_user):
     users = users_collection.find()
     menus = menus_collection.find()
     sales = sales_collection.find()
-    
+
     user_list = list(users)
     menu_list = list(menus)
     sale_list = list(sales)
-    
-    total_menus = 0
-    total_sales = 0
+
+    total_menus = len(menu_list)
+    total_sales = sum(sale['sales'] for sale in sale_list)
     count_per_role = defaultdict(int)
 
     for user in user_list:
         role = user.get('role', 'Uncategorized')
         count_per_role[role] += 1
-    
-    for menu in menu_list:
-        total_menus += 1
 
-    for sales in sale_list:
-        total_menus += 1
-    
     return render_template("dashboard.html", user_role=user_role, menus=menu_list, total_menus=total_menus, count_per_role=count_per_role, total_sales=total_sales)
-
 
 @app.route('/kelolaMenu')
 @admin_required
 def kelolaMenu(current_user):
+    user_role = get_user_role()
     menus = menus_collection.find()
     menu_list = list(menus)
-    
-    # Initialize counts
+
     count_per_category = defaultdict(int)
     total_menus = 0
-    
+
     for menu in menu_list:
         category = menu.get('kategorimenu', 'Uncategorized')
         count_per_category[category] += 1
         total_menus += 1
-    
-    return render_template('kelola_menu.html', menus=menu_list, count_per_category=count_per_category, total_menus=total_menus)
 
+    return render_template('kelola_menu.html', user_role=user_role, menus=menu_list, count_per_category=count_per_category, total_menus=total_menus)
 
 @app.route("/tambahMenu", methods=['POST'])
 @admin_required
 def tambahMenu(current_user):
     tambahmenu = {
-        'namamenu' : request.form['namaMenu'],
-        'hargamenu' : request.form['hargaMenu'],
-        'deskripsimenu' : request.form['deskripsiMenu'],
-        'kategorimenu' : request.form['kategoriMenu']
+        'namamenu': request.form['namaMenu'],
+        'hargamenu': request.form['hargaMenu'],
+        'deskripsimenu': request.form['deskripsiMenu'],
+        'kategorimenu': request.form['kategoriMenu']
     }
 
     file = request.files['fotoMenu']
@@ -335,18 +386,17 @@ def hapusMenu(current_user, menu_id):
         flash(f'Gagal menghapus menu: {str(e)}', 'danger')
     return redirect(url_for('kelolaMenu'))
 
-
 @app.route("/kelolaPesanan")
 @admin_required
 def kelolaPesanan(current_user):
     user_role = get_user_role()
-    return render_template("kelola_pesanan.html", user_role)
+    return render_template("kelola_pesanan.html", user_role=user_role)
 
 @app.route("/kelolaRekening")
 @admin_required
-def kelolaRekening(currentuser):
+def kelolaRekening(current_user):
     user_role = get_user_role()
-    return render_template("kelola_rekening.html", user_role)
+    return render_template("kelola_rekening.html", user_role=user_role)
 
 @app.route("/kelolaAdmin")
 @admin_required
