@@ -166,7 +166,7 @@ def regis():
 
 @app.route('/logout')
 @token_required
-def logout():
+def logout(current_user):
     resp = redirect(url_for('login'))
     resp.delete_cookie('token')
     return resp
@@ -227,7 +227,9 @@ def bayar(current_user):
 @token_required
 def keranjang(current_user):
     user_role = get_user_role()
-    return render_template("keranjang.html", user=current_user, user_role=user_role)
+    carts = carts_collection.find({'user_id': current_user['_id']})
+    cart_items = list(carts)
+    return render_template("keranjang.html", user=current_user, user_role=user_role, cart_items=cart_items)
 
 @app.route('/keranjang/<menu_id>', methods=['POST'])
 @token_required
@@ -247,7 +249,21 @@ def add_to_cart(current_user, menu_id):
         flash('Menu ditambahkan ke keranjang', 'success')
     else:
         flash('Menu tidak ditemukan', 'danger')
-    return redirect(url_for('index'))
+    return redirect(url_for('menu'))
+
+@app.route('/cart_count', methods=['GET'])
+@token_required
+def cart_count(current_user):
+    # Mengambil user_id dari current_user yang diambil dari token
+    user_id = current_user['_id']
+    if not user_id:
+        return jsonify({'error': 'user_id is required'}), 400
+
+    # Menghitung jumlah dokumen/item dalam koleksi yang sesuai dengan user_id
+    total_items = carts_collection.count_documents({'user_id': user_id})
+
+    return jsonify({'total_items': total_items})
+
 
 @app.route("/checkout")
 @token_required

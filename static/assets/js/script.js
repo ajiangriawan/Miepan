@@ -185,7 +185,7 @@ function filterCategory(category) {
 }
 
 function filterMenu(category) {
-  window.location.href = '/menu?category=' + category;
+  window.location.href = "/menu?category=" + category;
 }
 
 function find_word() {
@@ -204,32 +204,45 @@ function find_word() {
 }
 
 function find_menu() {
-  var input = document.getElementById('input-word').value.toLowerCase();
-  var cards = document.getElementsByClassName('menu-card');
+  var input = document.getElementById("input-word").value.toLowerCase();
+  var cards = document.getElementsByClassName("menu-card");
 
   for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      var title = card.getElementsByClassName('card-title')[0].innerText.toLowerCase();
-      if (title.includes(input)) {
-          card.parentElement.style.display = "";
-      } else {
-          card.parentElement.style.display = "none";
-      }
+    var card = cards[i];
+    var title = card
+      .getElementsByClassName("card-title")[0]
+      .innerText.toLowerCase();
+    if (title.includes(input)) {
+      card.parentElement.style.display = "";
+    } else {
+      card.parentElement.style.display = "none";
+    }
   }
 }
 
 function find_menuhome() {
-  var input = document.getElementById('input-word').value;
+  var input = document.getElementById("input-word").value;
   if (input) {
-      window.location.href = `/menu?search=${encodeURIComponent(input)}`;
+    window.location.href = `/menu?search=${encodeURIComponent(input)}`;
   }
 }
 
-window.onload = function() {
+window.onload = function () {
   const params = new URLSearchParams(window.location.search);
-  const searchQuery = params.get('search');
+  const searchQuery = params.get("search");
   if (searchQuery) {
-      document.getElementById('input-word').value = searchQuery;
-      find_menu();
+    document.getElementById("input-word").value = searchQuery;
+    find_menu();
   }
-}
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('/cart_count')
+      .then(response => response.json())
+      .then(data => {
+          if (data.total_items !== undefined) {
+              document.getElementById('total_cart').innerText = data.total_items;
+          }
+      })
+      .catch(error => console.error('Error fetching cart count:', error));
+});
