@@ -1,53 +1,3 @@
-function wcqib_refresh_quantity_increments() {
-  jQuery(
-    "div.quantity:not(.buttons_added), td.quantity:not(.buttons_added)"
-  ).each(function (a, b) {
-    var c = jQuery(b);
-    c.addClass("buttons_added"),
-      c
-        .children()
-        .first()
-        .before('<input type="button" value="-" class="minus" />'),
-      c
-        .children()
-        .last()
-        .after('<input type="button" value="+" class="plus" />');
-  });
-}
-
-String.prototype.getDecimals ||
-  (String.prototype.getDecimals = function () {
-    var a = this,
-      b = ("" + a).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
-    return b ? Math.max(0, (b[1] ? b[1].length : 0) - (b[2] ? +b[2] : 0)) : 0;
-  }),
-  jQuery(document).ready(function () {
-    wcqib_refresh_quantity_increments();
-  }),
-  jQuery(document).on("updated_wc_div", function () {
-    wcqib_refresh_quantity_increments();
-  }),
-  jQuery(document).on("click", ".plus, .minus", function () {
-    var a = jQuery(this).closest(".quantity").find(".qty"),
-      b = parseFloat(a.val()),
-      c = parseFloat(a.attr("max")),
-      d = parseFloat(a.attr("min")),
-      e = a.attr("step");
-    (b && "" !== b && "NaN" !== b) || (b = 0),
-      ("" !== c && "NaN" !== c) || (c = ""),
-      ("" !== d && "NaN" !== d) || (d = 0),
-      ("any" !== e && "" !== e && void 0 !== e && "NaN" !== parseFloat(e)) ||
-        (e = 1),
-      jQuery(this).is(".plus")
-        ? c && b >= c
-          ? a.val(c)
-          : a.val((b + parseFloat(e)).toFixed(e.getDecimals()))
-        : d && b <= d
-        ? a.val(d)
-        : b > 0 && a.val((b - parseFloat(e)).toFixed(e.getDecimals())),
-      a.trigger("change");
-  });
-
 document.addEventListener("DOMContentLoaded", function () {
   const navLinks = document.querySelectorAll(".nav-link#pesanan");
   const cards = document.querySelectorAll(".card[data-status]");
@@ -236,13 +186,118 @@ window.onload = function () {
   }
 };
 
-document.addEventListener('DOMContentLoaded', function() {
-  fetch('/cart_count')
-      .then(response => response.json())
-      .then(data => {
-          if (data.total_items !== undefined) {
-              document.getElementById('total_cart').innerText = data.total_items;
-          }
-      })
-      .catch(error => console.error('Error fetching cart count:', error));
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("/cart_count")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.total_items !== undefined) {
+        document.getElementById("total_cart").innerText = data.total_items;
+      }
+    })
+    .catch((error) => console.error("Error fetching cart count:", error));
 });
+
+function updateQuantity(itemId, action) {
+  fetch(`/update_quantity/${itemId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action: action }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        document.getElementById(`qty-${itemId}`).textContent =
+          data.new_quantity;
+        const newTotalPrice =
+          data.new_quantity *
+          parseInt(
+            document
+              .querySelector(`#checkbox-${itemId}`)
+              .closest(".card")
+              .querySelector(".item-price").textContent
+          );
+        document.getElementById(`total-price-${itemId}`).textContent =
+          newTotalPrice.toLocaleString("id-ID");
+        updateTotals();
+      } else {
+        alert(data.message);
+      }
+    });
+}
+
+function deleteItemFromCart(itemId) {
+  if (confirm("Apakah Anda yakin ingin menghapus item ini dari keranjang?")) {
+    fetch(`/delete_item/${itemId}`, {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Hapus elemen dari tampilan
+          document
+            .getElementById(`checkbox-${itemId}`)
+            .closest(".card")
+            .remove();
+          updateTotals();
+        } else {
+          alert(data.message);
+        }
+      });
+  }
+}
+
+function updateTotals() {
+  const checkboxes = document.querySelectorAll(".item-checkbox");
+  let totalItems = 0;
+  let totalAmount = 0;
+
+  checkboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      const itemId = checkbox.id.split("-")[1];
+      const quantity = parseInt(
+        document.getElementById(`qty-${itemId}`).textContent
+      );
+      const price = parseInt(
+        document
+          .querySelector(`#checkbox-${itemId}`)
+          .closest(".card")
+          .querySelector(".item-price").textContent
+      );
+      totalItems += quantity;
+      totalAmount += price * quantity;
+    }
+  });
+
+  document.getElementById("total-items").textContent = totalItems;
+  document.getElementById("total-amount").textContent =
+    "Rp. " + totalAmount.toLocaleString("id-ID") + ",-";
+}
+
+function toggleSelectAll(source) {
+  const checkboxes = document.querySelectorAll(".item-checkbox");
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+  updateTotals();
+}
+
+function addToCart(menuId) {
+  fetch(`/add_to_cart/${menuId}`, {
+    method: "POST",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        // Item berhasil ditambahkan ke keranjang
+        const checkbox = document.getElementById(`checkbox-${menuId}`);
+        if (checkbox) {
+          checkbox.checked = true; // Centang checkbox
+          updateTotals(); // Perbarui total pada halaman
+        }
+      } else {
+        alert(data.message); // Tampilkan pesan kesalahan jika ada
+      }
+    });
+}

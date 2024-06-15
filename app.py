@@ -11,6 +11,7 @@ import jwt
 import random
 from datetime import datetime, timedelta
 from collections import defaultdict
+from pymongo import DESCENDING
 
 # Load environment variables
 dotenv_path = join(dirname(__file__), '.env')
@@ -205,7 +206,6 @@ def detailMenu(menu_id):
     
     return render_template("detail_menu.html", user_role=user_role, menu=menu, different_category_menu=different_category_menu)
 
-
 @app.route("/tentang")
 def tentang():
     user_role = get_user_role()
@@ -223,12 +223,17 @@ def bayar(current_user):
     user_role = get_user_role()
     return render_template("pembayaran.html", user=current_user, user_role=user_role)
 
-@app.route("/keranjang")
+@app.route('/keranjang')
 @token_required
 def keranjang(current_user):
     user_role = get_user_role()
-    carts = carts_collection.find({'user_id': current_user['_id']})
+    carts = carts_collection.find({'user_id': current_user['_id']}).sort('created_at', DESCENDING)
     cart_items = list(carts)
+    # Ensure all prices and quantities are integers
+    for item in cart_items:
+        item['hargamenu'] = int(item['hargamenu'])
+        item['quantity'] = int(item['quantity'])
+        item['checked'] = True  # Set 'checked' field to True for rendering checkbox as checked
     return render_template("keranjang.html", user=current_user, user_role=user_role, cart_items=cart_items)
 
 @app.route('/keranjang/<menu_id>', methods=['POST'])
@@ -243,13 +248,43 @@ def add_to_cart(current_user, menu_id):
             'quantity': 1,
             'namamenu': menu['namamenu'],
             'hargamenu': menu['hargamenu'],
-            'fotomenu': menu['fotomenu']
+            'fotomenu': menu['fotomenu'],
+            'created_at': datetime.now(),
         }
         carts_collection.insert_one(cart_item)
         flash('Menu ditambahkan ke keranjang', 'success')
     else:
         flash('Menu tidak ditemukan', 'danger')
     return redirect(url_for('menu'))
+
+@app.route('/update_quantity/<item_id>', methods=['POST'])
+@token_required
+def update_quantity(current_user, item_id):
+    data = request.get_json()
+    action = data.get('action')
+    item = carts_collection.find_one({'_id': ObjectId(item_id), 'user_id': current_user['_id']})
+    
+    if item:
+        if action == 'increase':
+            new_quantity = item['quantity'] + 1
+        elif action == 'decrease' and item['quantity'] > 1:
+            new_quantity = item['quantity'] - 1
+        else:
+            return jsonify({'success': False, 'message': 'Invalid action or quantity cannot be less than 1'})
+
+        carts_collection.update_one({'_id': ObjectId(item_id)}, {'$set': {'quantity': new_quantity}})
+        return jsonify({'success': True, 'new_quantity': new_quantity})
+    else:
+        return jsonify({'success': False, 'message': 'Item not found in cart'})
+
+@app.route('/delete_item/<item_id>', methods=['DELETE'])
+@token_required
+def delete_item(current_user, item_id):
+    result = carts_collection.delete_one({'_id': ObjectId(item_id), 'user_id': current_user['_id']})
+    if result.deleted_count == 1:
+        return jsonify({'success': True, 'message': 'Item berhasil dihapus'}), 200
+    else:
+        return jsonify({'success': False, 'message': 'Item tidak ditemukan'}), 404
 
 @app.route('/cart_count', methods=['GET'])
 @token_required
@@ -264,12 +299,53 @@ def cart_count(current_user):
 
     return jsonify({'total_items': total_items})
 
+@app.route('/checkout/<menu_id>', methods=['POST'])
+@token_required
+def direct_checkout(current_user, menu_id):
+    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
+    if menu:
+        # Langsung proses checkout untuk item yang dipilih
+        return redirect(url_for('checkout', menu_id=menu_id))
+    else:
+        flash('Menu tidak ditemukan', 'danger')
+        return redirect(url_for('menu'))
 
-@app.route("/checkout")
+def validate_cart_items(cart_items):
+    for item in cart_items:
+        try:
+            item['hargamenu'] = float(item['hargamenu'])
+            item['quantity'] = int(item['quantity'])
+        except ValueError:
+            return False
+    return True
+
+# Proses checkout
+@app.route("/checkout", methods=['GET', 'POST'])
 @token_required
 def checkout(current_user):
     user_role = get_user_role()
-    return render_template("checkout.html", user=current_user, user_role=user_role)
+    if request.method == 'POST':
+        # Ambil semua item dari keranjang atau item tunggal untuk checkout
+        cart_items = list(carts_collection.find({'user_id': current_user['_id']}))
+        if not validate_cart_items(cart_items):
+            flash('Invalid data in cart items.', 'danger')
+            return redirect(url_for('index'))
+
+        total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
+        # Tambahkan logika untuk memproses pembayaran dan mengosongkan keranjang
+        carts_collection.delete_many({'user_id': current_user['_id']})
+        flash('Pembayaran berhasil, terima kasih telah berbelanja!', 'success')
+        return redirect(url_for('index'))
+    else:
+        # Jika bukan post, tampilkan halaman checkout
+        cart_items = list(carts_collection.find({'user_id': current_user['_id']}))
+        if not validate_cart_items(cart_items):
+            flash('Invalid data in cart items.', 'danger')
+            return redirect(url_for('index'))
+
+        total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
+        return render_template("checkout.html", user=current_user, user_role=user_role, cart_items=cart_items, total_amount=total_amount)
+
 
 @app.route("/profil")
 @token_required

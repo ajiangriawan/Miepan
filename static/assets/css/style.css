@@ -13,6 +13,7 @@
   --bs-blue:#ff8a08;
   --bs-link-color:#ff8a08;
   --bs-link-hover-color:#ff8a08;
+  --bs-red:#d31a20;
 }
 
 .nav-link,
@@ -251,6 +252,7 @@ section {
 #card-keranjang {
   flex-direction: row;
   padding: 5px;
+  justify-content: space-between;
 }
 
 .form-check-input {
