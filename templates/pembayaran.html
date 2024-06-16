@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Dashboard
+Pembayaran
 {% endblock %}
 
-{% block content%}
+{% block content %}
 
-<!-- ======= Main Content ======= -->
 <div class="container d-flex flex-column text-center mt-3 mb-5 align-items-center justify-content-center">
     <div class="container text-center">
         <h3>Pembayaran</h3>
@@ -15,23 +14,28 @@ Dashboard
     <div class="card border p-2" style="width: 80%;">
         <div class="row g-0 align-items-center justify-content-center">
             <div class="col-md-4">
-                <img src="../static/assets/img/barcode.png" class="img-fluid rounded-start" alt="barcode">
+                <img src="{{ url_for('static', filename='assets/img/barcode.png') }}" class="img-fluid rounded-start"
+                    alt="barcode">
             </div>
             <div class="col-md-8">
                 <div class="card-body">
                     <div class="container text-center">
                         <div class="row align-items-center justify-content-center text-start">
                             <h5>Metode Pembayaran:</h5>
-                            <h2>xxxxxxxxx</h2>
+                            <h2>{{ order['payment_method'] }}</h2>
                             <h5>No Pesanan:</h5>
-                            <h2>xxxxxxxxx</h2>
+                            <h2>{{ order['order_number'] }}</h2>
                             <h5>Nama Pemesan:</h5>
-                            <h2>xxxxxxxxx</h2>
+                            <h2>{{ order['user_name'] }}</h2>
                             <h5>Total :</h5>
-                            <h2>Rp. xxxxxxxxx</h2>
-                            <input type="file" class="form-control mb-2 mt-2" id="inputGroupFile04"
-                                aria-describedby="inputGroupFileAddon04" aria-label="Upload">
-                            <button class="btn btn-primary" type="button" id="inputGroupFileAddon04">Kirim</button>
+                            <h2>Rp. {{ order['total_amount'] }}</h2>
+                            <form method="post"
+                                action="{{ url_for('upload_bukti_pembayaran', order_number=order['order_number']) }}"
+                                enctype="multipart/form-data">
+                                <input type="file" class="form-control mb-2 mt-2" id="inputGroupFile04" name="bukti"
+                                    required>
+                                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Kirim</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -39,6 +43,5 @@ Dashboard
         </div>
     </div>
 </div>
-<!-- ======= End of Main Content ======= -->
 
 {% endblock %}

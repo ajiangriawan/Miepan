@@ -22,19 +22,15 @@ Checkout
                             style="max-width: 70px;">
                     </div>
                     <div class="col d-flex flex-wrap">
-                        <!-- Nama Pesanan -->
                         <p>{{ item['namamenu'] }}</p>
                     </div>
                     <div class="col d-flex flex-wrap">
-                        <!-- Harga -->
                         <p>Rp. {{ item['hargamenu']|int }}</p>
                     </div>
                     <div class="col d-flex flex-wrap align-items-center">
-                        <!-- Quantity -->
                         <p>{{ item['quantity'] }}</p>
                     </div>
                     <div class="col d-flex flex-wrap">
-                        <!-- Total Harga -->
                         <p>Rp. {{ item['hargamenu']|int * item['quantity'] }}</p>
                     </div>
                 </a>
@@ -47,9 +43,9 @@ Checkout
             <form action="{{ url_for('checkout') }}" method="POST">
                 <select class="form-select" aria-label="Pilih Metode Pembayaran" name="metode_pembayaran">
                     <option selected disabled>Pilih Pembayaran</option>
-                    <option value="1">BCA</option>
-                    <option value="2">OVO</option>
-                    <option value="3">Kasir</option>
+                    <option value="bca">BCA</option>
+                    <option value="ovo">OVO</option>
+                    <option value="kasir">Kasir</option>
                 </select>
                 <p>Nama Pemesan</p>
                 <h5>{{ user['nama'] }}</h5>

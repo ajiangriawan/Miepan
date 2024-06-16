@@ -1,80 +1,91 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Menu
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %} Menu {% endblock %} {% block content
+%}
 <!-- ======= Main Content ======= -->
 <section class="pattern">
-    <div class="geeks">
-        <div class="container text-center mb-3">
-            <div class="container text-center mb-5">
-                <h1 style="color: #fefefe;">Menu</h1>
+  <div class="geeks">
+    <div class="container text-center mb-3">
+      <div class="container text-center mb-5">
+        <h1 style="color: #fefefe">Menu</h1>
+      </div>
+      <div class="search-box d-flex justify-content-center mb-5">
+        <input
+          id="input-word"
+          class="form-control"
+          style="margin-right: 0.5rem"
+          placeholder="cari disini"
+          oninput="find_menu()"
+        />
+        <button class="btn btn-primary" onclick="find_menu()">Cari</button>
+      </div>
+      <div class="text-center mt-2 d-flex flex-wrap flex-row grid gap-3">
+        {% for category in categories %}
+        <div class="col d-flex justify-content-center align-items-center">
+          <div
+            class="card mb-3 card-kategori gap-2 p-1"
+            onclick="filterMenu('{{ category.namakategori }}')"
+          >
+            <div class="row">
+              <img
+                src="{{category.fotokategori}}"
+                class="img-fluid rounded-start"
+                alt="{{ category }}"
+                id="kategori-img"
+              />
             </div>
-            <div class="search-box d-flex justify-content-center mb-5">
-                <input id="input-word" class="form-control" style="margin-right: 0.5rem" placeholder="cari disini"
-                    oninput="find_menu()" />
-                <button class="btn btn-primary" onclick="find_menu()">Cari</button>
+            <div class="row">
+              <p class="card-text">{{ category.namakategori }}</p>
             </div>
-            <div class="text-center mt-2 d-flex flex-wrap flex-row grid gap-3">
-                {% for category in categories %}
-                <div class="col d-flex justify-content-center align-items-center">
-                    <div class="card mb-3 card-kategori gap-2 p-1" onclick="filterMenu('{{ category.namakategori }}')">
-                        <div class="row">
-                            <img src="{{category.fotokategori}}" class="img-fluid rounded-start" alt="{{ category }}"
-                                id="kategori-img">
-                        </div>
-                        <div class="row">
-                            <p class="card-text">{{ category.namakategori }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+          </div>
         </div>
+        {% endfor %}
+      </div>
     </div>
+  </div>
 </section>
 
 <div class="container text-center mb-5">
-    <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3 justify-content-center" id="container-card">
-        {% for menu in menus %}
-        <div class="col p-0 menu-card" style="max-width: 14rem;">
-            <a href="/detail_menu/{{ menu['_id'] }}" class="p-0">
-                <div class="card h-100 menu-card">
-                    <div class="d-flex align-items-center justify-content-center p-2" style="width: 100%;">
-                        <img src="{{menu['fotomenu']}}" class="card-img-top" alt="menu" style="width: 50%">
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="container text-start">
-                            <div class="row">
-                                <div class="col">
-                                    <h5 class="card-title">{{menu['namamenu']}}</h5>
-                                    <p>Rp. {{menu['hargamenu']}},-</p>
-                                    <p class="rating">
-                                        ⭐7.4
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col text-start d-flex justify-content-evenly mb-3">
-                                <form action="/keranjang/{{ menu['_id'] }}" method="post">
-                                    <button type="submit" class="btn btn-outline-primary material-symbols-outlined">
-                                        add_shopping_cart
-                                    </button>
-                                </form>
-                                <form action="/checkout" method="post">
-                                    <button type="submit" class="btn btn-primary">
-                                        Beli Sekarang
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+  <div
+    class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3 justify-content-center"
+    id="container-card"
+  >
+    {% for menu in menus %}
+    <div class="col p-0 menu-card" style="max-width: 14rem">
+      <a href="/detail_menu/{{ menu['_id'] }}" class="p-0">
+        <div class="card h-100 menu-card">
+          <div
+            class="d-flex align-items-center justify-content-center p-2"
+            style="width: 100%"
+          >
+            <img
+              src="{{menu['fotomenu']}}"
+              class="card-img-top"
+              alt="menu"
+              style="width: 50%"
+            />
+          </div>
+          <div class="card-body p-0">
+            <div class="container text-start">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title">{{menu['namamenu']}}</h5>
+                  <p>Rp. {{menu['hargamenu']}},-</p>
+                  <p class="rating">⭐7.4</p>
                 </div>
-            </a>
+              </div>
+              <div class="col text-start d-flex justify-content-evenly mb-3">
+                <form action="/keranjang/{{ menu['_id'] }}" method="post">
+                  <button type="submit" class="btn btn-primary" style="width: 10rem;">
+                    <i class="material-symbols-outlined"> add_shopping_cart </i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-        {% endfor %}
+      </a>
     </div>
+    {% endfor %}
+  </div>
 </div>
 <!-- ======= End of Main Content ======= -->
 

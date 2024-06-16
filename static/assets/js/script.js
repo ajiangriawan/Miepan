@@ -1,59 +1,3 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const navLinks = document.querySelectorAll(".nav-link#pesanan");
-  const cards = document.querySelectorAll(".card[data-status]");
-
-  function filterCards(status) {
-    cards.forEach((card) => {
-      card.style.display =
-        card.getAttribute("data-status") === status ? "block" : "none";
-    });
-  }
-
-  function handleNavClick(event) {
-    event.preventDefault();
-
-    navLinks.forEach((nav) => nav.classList.remove("active"));
-    this.classList.add("active");
-
-    const status = this.getAttribute("data-status");
-    filterCards(status);
-  }
-
-  navLinks.forEach((link) => {
-    link.addEventListener("click", handleNavClick);
-  });
-
-  filterCards("belum-dibayar");
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  const navLinks = document.querySelectorAll(".nav-link#kelolaPesanan");
-  const cards = document.querySelectorAll(".card[data-status]");
-
-  function filterCards(status) {
-    cards.forEach((card) => {
-      card.style.display =
-        card.getAttribute("data-status") === status ? "block" : "none";
-    });
-  }
-
-  function handleNavClick(event) {
-    event.preventDefault();
-
-    navLinks.forEach((nav) => nav.classList.remove("active"));
-    this.classList.add("active");
-
-    const status = this.getAttribute("data-status");
-    filterCards(status);
-  }
-
-  navLinks.forEach((link) => {
-    link.addEventListener("click", handleNavClick);
-  });
-
-  filterCards("cek");
-});
-
 document.addEventListener("DOMContentLoaded", (event) => {
   const stars = document.querySelectorAll(".star");
   const ratingInput = document.getElementById("rating");
@@ -301,3 +245,82 @@ function addToCart(menuId) {
       }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const navLinks = document.querySelectorAll(".nav-link#pesanan");
+  const cards = document.querySelectorAll(".card[data-status]");
+  const messages = document.querySelectorAll("p[data-status]");
+
+  function filterCards(status) {
+    let hasCards = false;
+    cards.forEach((card) => {
+      if (card.getAttribute("data-status") === status) {
+        card.style.display = "block";
+        hasCards = true;
+      } else {
+        card.style.display = "none";
+      }
+    });
+
+    messages.forEach((message) => {
+      message.style.display =
+        message.getAttribute("data-status") === status && !hasCards
+          ? "block"
+          : "none";
+    });
+  }
+
+  function handleNavClick(event) {
+    event.preventDefault();
+
+    navLinks.forEach((nav) => nav.classList.remove("active"));
+    this.classList.add("active");
+
+    const status = this.getAttribute("data-status");
+    filterCards(status);
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", handleNavClick);
+  });
+
+  filterCards("belum-dibayar");
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const navLinks = document.querySelectorAll(".nav-link#kelolaPesanan");
+  const cards = document.querySelectorAll(".card[data-status]");
+  const messages = document.querySelectorAll("p[data-status]");
+
+  function filterCards(status) {
+      let hasCards = false;
+      cards.forEach((card) => {
+          if (card.getAttribute("data-status") === status) {
+              card.style.display = "block";
+              hasCards = true;
+          } else {
+              card.style.display = "none";
+          }
+      });
+
+      messages.forEach((message) => {
+          message.style.display = (message.getAttribute("data-status") === status && !hasCards) ? "block" : "none";
+      });
+  }
+
+  function handleNavClick(event) {
+      event.preventDefault();
+
+      navLinks.forEach((nav) => nav.classList.remove("active"));
+      this.classList.add("active");
+
+      const status = this.getAttribute("data-status");
+      filterCards(status);
+  }
+
+  navLinks.forEach((link) => {
+      link.addEventListener("click", handleNavClick);
+  });
+
+  filterCards("menunggu-konfirmasi");
+});

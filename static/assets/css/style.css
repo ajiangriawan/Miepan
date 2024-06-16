@@ -99,6 +99,10 @@ header {
   font-weight: bold;
 }
 
+.awal {
+  margin-top: 5rem;
+}
+
 .main-content {
   padding-top: 5px;
   width: 100%;
@@ -275,6 +279,51 @@ section {
 
 #checkout-total {
   width: 40%;
+}
+
+.receipt {
+  width: 80mm;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin: auto;
+  font-size: 12px;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.receipt-details
+{
+  text-align: left;
+}
+
+.receipt-footer {
+  text-align: center;
+}
+
+.receipt-table th,
+.receipt-table td {
+  padding: 5px;
+  border: none;
+}
+
+.receipt-table tfoot th,
+.receipt-table tfoot td {
+  border-top: 1px solid #ddd;
+}
+
+.btn-print {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+}
+
+@media print {
+  .btn-print {
+    display: none;
+  }
 }
 
 footer {

@@ -1,0 +1,85 @@
+{% extends 'sidenav.html' %}
+
+{% block title %}
+Struk Pesanan
+{% endblock %}
+
+{% block content %}
+<div class="receipt mt-5">
+  <!-- Header -->
+  <div class="receipt-header">
+    <h2>Miepan</h2>
+    <p>Jl. Cendrawasih Raya No.1, Kayuringin Jaya, Kec. Bekasi Sel., Kota Bks, DKI Jakarta</p>
+    <p>Telepon: 087809876543</p>
+  </div>
+
+  <!-- Details -->
+  <table class="receipt-table w-100">
+    <thead>
+      <tr>
+        <td><strong>No. Pesanan</strong></td>
+        <td>: {{ order.order_number }}</td>
+      </tr>
+      <tr>
+        <td><strong>Tanggal</strong></td>
+        <td>: {{ order.order_date }}</td>
+      </tr>
+      <tr>
+        <td><strong>Pelanggan</strong></td>
+        <td>: {{ order.user_name }}</td>
+      </tr>
+    </thead>
+  </table>
+
+  <!-- Table -->
+  <table class="receipt-table w-100">
+    <thead>
+      <tr>
+        <th>Nama Produk</th>
+        <th>Jumlah</th>
+        <th>Harga Satuan</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.namamenu }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.hargamenu }}</td>
+        <td>Rp. {{ item.quantity * item.hargamenu }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3">Total</th>
+        <th>Rp.{{ order.total_amount }}</th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Footer -->
+  <div class="receipt-footer">
+    <p>Terima kasih telah berbelanja di Miepan</p>
+  </div>
+</div>
+<!-- Print Button -->
+<div class="container">
+  <button class="btn btn-primary btn-print" onclick="printReceipt()">
+    Cetak Struk
+  </button>
+</div>
+
+<script>
+  function printReceipt() {
+    const printContent = document.querySelector('.receipt').outerHTML;
+    const originalContent = document.body.innerHTML;
+
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+  }
+</script>
+
+{% endblock %}
