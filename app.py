@@ -243,7 +243,7 @@ def pesanan(current_user):
         else:
             reviews_dict[order_number] = [review]
 
-    return render_template("pesanan.html", user=current_user, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai, reviews_dict=reviews_dict)
+    return render_template("pesanan.html", user=current_user, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai, reviews_dict=reviews_dict, review=review)
 
 @app.route("/bayar")
 @token_required
