@@ -46,9 +46,12 @@ Detail Pesanan
       </div>
     </div>
     <div class="card-footer d-flex flex-wrap justify-content-end">
+      <a href="{{ url_for('pesanan') }}" class="btn btn-outline-primary me-2">Kembali</a>
+      {% if user_role == 'admin' %}
       <a href="{{ url_for('kelolaPesanan') }}" class="btn btn-outline-primary me-2">Kembali</a>
       <a href="{{ url_for('kelolaPesanan') }}" class="btn btn-outline-secondary me-2">Tolak</a>
       <a href="{{ url_for('prosesPesanan', order_id=order._id) }}" class="btn btn-primary">Proses</a>
+      {% endif %}
     </div>
   </div>
 </div>

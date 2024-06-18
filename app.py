@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from pymongo import DESCENDING
 from bson.json_util import dumps
+from bson import ObjectId
+from datetime import datetime
+from flask import jsonify, request
 
 # Load environment variables
 dotenv_path = join(dirname(__file__), '.env')
@@ -48,6 +51,7 @@ menus_collection = db.menus
 sales_collection = db.sales
 categories_collection = db.categories
 carts_collection = db.carts
+reviews_collection = db.reviews
 
 def generate_fake_sales_data(num_days):
     sales_data = []
@@ -228,7 +232,18 @@ def pesanan(current_user):
     menunggu_konfirmasi = list(sales_collection.find({'user_id': user_id, 'status': 'menunggu konfirmasi'}))
     proses = list(sales_collection.find({'user_id': user_id, 'status': 'proses'}))
     selesai = list(sales_collection.find({'user_id': user_id, 'status': 'selesai'}))
-    return render_template("pesanan.html", user=current_user, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai)
+
+    # Fetch reviews and organize into reviews_dict
+    reviews = reviews_collection.find()
+    reviews_dict = {}
+    for review in reviews:
+        order_number = review['order_number']
+        if order_number in reviews_dict:
+            reviews_dict[order_number].append(review)
+        else:
+            reviews_dict[order_number] = [review]
+
+    return render_template("pesanan.html", user=current_user, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai, reviews_dict=reviews_dict)
 
 @app.route("/bayar")
 @token_required
@@ -598,7 +613,7 @@ def kelolaPesanan(current_user):
     return render_template("kelola_pesanan.html", user=current_user, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai)
 
 @app.route('/detailPesanan/<order_id>', methods=['GET'])
-@admin_required
+@token_required
 def detailPesanan(current_user, order_id):
     order = sales_collection.find_one({'_id': ObjectId(order_id)})
     if order:
@@ -680,6 +695,128 @@ def selesaiPesanan(current_user, order_id):
     except Exception as e:
         flash(f'Gagal mengubah status pesanan: {str(e)}', 'danger')
     return redirect(url_for('kelolaPesanan'))
+
+@app.route('/nilaiPesanan/<order_id>', methods=['GET'])
+@token_required
+def nilaiPesanan(current_user, order_id):
+    order = sales_collection.find_one({'_id': ObjectId(order_id)})
+    review= reviews_collection.find()
+    if order:
+        order['_id'] = str(order['_id'])
+        items = order.get('items', [])
+        for item in items:
+            menu = menus_collection.find_one({'_id': ObjectId(item['menu_id'])})
+            if menu:
+                item['fotomenu'] = menu.get('fotomenu', '')
+                item['namamenu'] = menu.get('namamenu', '')
+            review = reviews_collection.find_one({'user_id': current_user['_id'], 'menu_id': ObjectId(item['menu_id'])})
+            if review:
+                item['review'] = {
+                    '_id': str(review['_id']),
+                    'rating': review['rating'],
+                    'comment': review['comment']
+                }
+            item['_id'] = str(item['_id'])
+            item['menu_id'] = str(item['menu_id'])
+            item['quantity'] = int(item['quantity'])
+            item['hargamenu'] = float(item['hargamenu'])
+        order['items'] = items
+        return render_template('nilai_pesanan.html', order=order, items=items, review=review)
+    else:
+        flash('Order not found.', 'danger')
+        return redirect(url_for('kelolaPesanan'))
+
+@app.route('/submit_review', methods=['POST'])
+@token_required
+def submit_review(current_user):
+    data = request.json
+    menu_id = data.get('menu_id')
+    order_number = data.get('order_number')
+    rating = data.get('rating')
+    comment = data.get('comment')
+
+    if not menu_id or not rating or not order_number:
+        return jsonify({'success': False, 'message': 'Menu ID, Order Number, and rating are required.'}), 400
+
+    try:
+        rating = int(rating)
+        if rating < 1 or rating > 5:
+            raise ValueError('Rating must be between 1 and 5.')
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+    existing_review = reviews_collection.find_one({'user_id': current_user['_id'], 'menu_id': ObjectId(menu_id), 'order_number': order_number})
+
+    if existing_review:
+        try:
+            reviews_collection.update_one(
+                {'_id': existing_review['_id']},
+                {'$set': {'rating': rating, 'comment': comment, 'timestamp': datetime.now()}}
+            )
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+    else:
+        review = {
+            'user_id': current_user['_id'],
+            'menu_id': ObjectId(menu_id),
+            'order_number': order_number,
+            'rating': rating,
+            'comment': comment,
+            'timestamp': datetime.now()
+        }
+
+        try:
+            reviews_collection.insert_one(review)
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    menu_reviews = list(reviews_collection.find({'menu_id': ObjectId(menu_id)}))
+    if menu_reviews:
+        average_rating = sum([review['rating'] for review in menu_reviews]) / len(menu_reviews)
+    else:
+        average_rating = 0
+
+    menus_collection.update_one({'_id': ObjectId(menu_id)}, {'$set': {'average_rating': average_rating}})
+
+    return jsonify({'success': True, 'message': 'Review submitted successfully.'})
+
+@app.route('/edit_review/<review_id>', methods=['PUT'])
+@token_required
+def edit_review(current_user, review_id):
+    data = request.json
+    rating = data.get('rating')
+    comment = data.get('comment')
+
+    if not rating:
+        return jsonify({'success': False, 'message': 'Rating is required.'}), 400
+
+    try:
+        rating = int(rating)
+        if rating < 1 or rating > 5:
+            raise ValueError('Rating must be between 1 and 5.')
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+    try:
+        reviews_collection.update_one(
+            {'_id': ObjectId(review_id), 'user_id': current_user['_id']},
+            {'$set': {'rating': rating, 'comment': comment, 'timestamp': datetime.now()}}
+        )
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+    review = reviews_collection.find_one({'_id': ObjectId(review_id)})
+    menu_id = review['menu_id']
+
+    menu_reviews = list(reviews_collection.find({'menu_id': ObjectId(menu_id)}))
+    if menu_reviews:
+        average_rating = sum([review['rating'] for review in menu_reviews]) / len(menu_reviews)
+    else:
+        average_rating = 0
+
+    menus_collection.update_one({'_id': ObjectId(menu_id)}, {'$set': {'average_rating': average_rating}})
+
+    return jsonify({'success': True, 'message': 'Review edited successfully.'})
 
 @app.route("/kelolaRekening")
 @admin_required

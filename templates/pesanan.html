@@ -1,202 +1,333 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Pesanan
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %} Pesanan {% endblock %} {% block
+content %}
 <!-- ======= Main Content ======= -->
 <div class="container text-center mt-3 mb-5">
-    <div class="container text-start">
-        <h3>Pesanan</h3>
-        <br>
+  <div class="container text-start">
+    <h3>Pesanan</h3>
+    <br />
+  </div>
+  <div class="text-center border rounded p-2">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            aria-current="true"
+            href="#"
+            data-status="belum-dibayar"
+            id="pesanan"
+            >Belum Dibayar</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            aria-current="true"
+            href="#"
+            data-status="menunggu-konfirmasi"
+            id="pesanan"
+            >Konfirmasi</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-status="proses" id="pesanan"
+            >Proses</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-status="selesai" id="pesanan"
+            >Selesai</a
+          >
+        </li>
+      </ul>
     </div>
-    <div class="text-center border rounded p-2">
-        <div class="card-header">
-            <ul class="nav nav-tabs card-header-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="true" href="#" data-status="belum-dibayar"
-                        id="pesanan">Belum Dibayar</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="true" href="#" data-status="menunggu-konfirmasi"
-                        id="pesanan">Konfirmasi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-status="proses" id="pesanan">Proses</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-status="selesai" id="pesanan">Selesai</a>
-                </li>
-            </ul>
-        </div>
-        <div class="card-body">
-            <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card">
-                <!-- Belum Dibayar -->
-                {% if belum_dibayar %}
-                {% for order in belum_dibayar %}
-                <div class="card" style="width: 100%;" data-status="belum-dibayar">
-                    <div class="row g-0 align-items-center justify-content-start">
-                        <div class="col-md-2">
-                            <img src="{{ url_for('static', filename='assets/img/k.jpg') }}"
-                                class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
-                        </div>
-                        <div class="col-md-10">
-                            <div class="card-body">
-                                <div class="container text-center">
-                                    <div class="row align-items-center justify-content-center text-start">
-                                        <div class="col-md-3 d-flex justify-content-start">{{ order['order_number'] }}
-                                        </div>
-                                        <div class="col-md-1">{{ order['total_items'] }}</div>
-                                        <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
-                                        <div class="col-md-2 d-flex justify-content-end">
-                                            <a href="/payment/{{ order['order_number'] }}"
-                                                class="btn btn-primary">Bayar</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <p class="text-center w-100" data-status="belum-dibayar">Tidak ada produk yang belum dibayar.</p>
-                {% endif %}
-
-                
-                <!-- Konfirmasi -->
-                {% if menunggu_konfirmasi %}
-                {% for order in menunggu_konfirmasi %}
-                <div class="card" style="width: 100%;" data-status="menunggu-konfirmasi">
-                    <div class="row g-0 align-items-center justify-content-center">
-                        <div class="col-md-2">
-                            <img src="{{ url_for('static', filename='assets/img/k.jpg') }}"
-                                class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
-                        </div>
-                        <div class="col-md-10">
-                            <div class="card-body">
-                                <div class="container text-center">
-                                    <div class="row align-items-center justify-content-center text-start">
-                                        <div class="col-md-3">{{ order['order_number'] }}</div>
-                                        <div class="col-md-1">{{ order['total_items'] }}</div>
-                                        <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
-                                        <div class="col-md-2"><i>Menungu Konfirmasi</i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <p class="text-center w-100" data-status="menunggu-konfirmasi">Tidak ada produk yang menunggu konfirmasi.</p>
-                {% endif %}
-
-                <!-- Proses -->
-                {% if proses %}
-                {% for order in proses %}
-                <div class="card" style="width: 100%;" data-status="proses">
-                    <div class="row g-0 align-items-center justify-content-center">
-                        <div class="col-md-2">
-                            <img src="{{ url_for('static', filename='assets/img/k.jpg') }}"
-                                class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
-                        </div>
-                        <div class="col-md-10">
-                            <div class="card-body">
-                                <div class="container text-center">
-                                    <div class="row align-items-center justify-content-center text-start">
-                                        <div class="col-md-3">{{ order['order_number'] }}</div>
-                                        <div class="col-md-1">{{ order['total_items'] }}</div>
-                                        <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
-                                        <div class="col-md-2"><i>Proses</i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <p class="text-center w-100" data-status="proses">Tidak ada produk yang sedang diproses.</p>
-                {% endif %}
-
-                <!-- Selesai -->
-                {% if selesai %}
-                {% for order in selesai %}
-                <div class="card" style="width: 100%;" data-status="selesai">
-                    <div class="row g-0 align-items-center justify-content-center">
-                        <div class="col-md-2">
-                            <img src="{{ url_for('static', filename='assets/img/k.jpg') }}"
-                                class="img-fluid rounded-start" alt="..." style="max-width: 70px;">
-                        </div>
-                        <div class="col-md-10">
-                            <div class="card-body">
-                                <div class="container text-center">
-                                    <div class="row align-items-center justify-content-center text-start">
-                                        <div class="col-md-3">{{ order['order_number'] }}</div>
-                                        <div class="col-md-1">{{ order['total_items'] }}</div>
-                                        <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
-                                        <div class="col-md-2 d-flex justify-content-end">
-                                            <a href="#" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#nilaiModal">Nilai</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <p class="text-center w-100" data-status="selesai">Tidak ada produk yang telah selesai.</p>
-                {% endif %}
+    <div class="card-body">
+      <div
+        class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3"
+        id="container-card"
+      >
+        <!-- Belum Dibayar -->
+        {% if belum_dibayar %} {% for order in belum_dibayar %}
+        <div class="card" style="width: 100%" data-status="belum-dibayar">
+          <div class="row g-0 align-items-center justify-content-start">
+            <div class="col-md-2">
+              <img
+                src="{{ url_for('static', filename='assets/img/k.jpg') }}"
+                class="img-fluid rounded-start"
+                alt="..."
+                style="max-width: 70px"
+              />
             </div>
+            <div class="col-md-10">
+              <div class="card-body">
+                <div class="container text-center">
+                  <div
+                    class="row align-items-center justify-content-center text-start"
+                  >
+                    <div class="col-md-3 d-flex justify-content-start">
+                      {{ order['order_number'] }}
+                    </div>
+                    <div class="col-md-1">{{ order['total_items'] }}</div>
+                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-2 d-flex justify-content-end">
+                      <a
+                        href="/payment/{{ order['order_number'] }}"
+                        class="btn btn-primary"
+                        >Bayar</a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        {% endfor %} {% else %}
+        <p class="text-center w-100" data-status="belum-dibayar">
+          Tidak ada produk yang belum dibayar.
+        </p>
+        {% endif %}
+
+        <!-- Konfirmasi -->
+        {% if menunggu_konfirmasi %} {% for order in menunggu_konfirmasi %}
+        <div class="card" style="width: 100%" data-status="menunggu-konfirmasi">
+          <div class="row g-0 align-items-center justify-content-center">
+            <div class="col-md-2">
+              <img
+                src="{{ url_for('static', filename='assets/img/k.jpg') }}"
+                class="img-fluid rounded-start"
+                alt="..."
+                style="max-width: 70px"
+              />
+            </div>
+            <div class="col-md-10">
+              <div class="card-body">
+                <div class="container text-center">
+                  <div
+                    class="row align-items-center justify-content-center text-start"
+                  >
+                    <div class="col-md-3">{{ order['order_number'] }}</div>
+                    <div class="col-md-1">{{ order['total_items'] }}</div>
+                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-2"><i>Menunggu Konfirmasi</i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="text-center w-100" data-status="menunggu-konfirmasi">
+          Tidak ada produk yang menunggu konfirmasi.
+        </p>
+        {% endif %}
+
+        <!-- Proses -->
+        {% if proses %} {% for order in proses %}
+        <div class="card" style="width: 100%" data-status="proses">
+          <div class="row g-0 align-items-center justify-content-center">
+            <div class="col-md-2">
+              <img
+                src="{{ url_for('static', filename='assets/img/k.jpg') }}"
+                class="img-fluid rounded-start"
+                alt="..."
+                style="max-width: 70px"
+              />
+            </div>
+            <div class="col-md-10">
+              <div class="card-body">
+                <div class="container text-center">
+                  <div
+                    class="row align-items-center justify-content-center text-start"
+                  >
+                    <div class="col-md-3">{{ order['order_number'] }}</div>
+                    <div class="col-md-1">{{ order['total_items'] }}</div>
+                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-2"><i>Proses</i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="text-center w-100" data-status="proses">
+          Tidak ada produk yang sedang diproses.
+        </p>
+        {% endif %}
+
+        <!-- Selesai -->
+        {% if selesai %} {% for order in selesai %}
+        <div class="card" style="width: 100%" data-status="selesai">
+          <div class="row g-0 align-items-center justify-content-center">
+            <div class="col-md-2">
+              <img
+                src="{{ url_for('static', filename='assets/img/k.jpg') }}"
+                class="img-fluid rounded-start"
+                alt="..."
+                style="max-width: 70px"
+              />
+            </div>
+            <div class="col-md-10">
+              <div class="card-body">
+                <div class="container text-center">
+                  <div
+                    class="row align-items-center justify-content-center text-start"
+                  >
+                    <div class="col-md-3">{{ order['order_number'] }}</div>
+                    <div class="col-md-1">{{ order['total_items'] }}</div>
+                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-2">
+                          <p><strong>Daftar Menu:</strong></p>
+                          <ul>
+                            {% for item in order['items'] %}
+                              <li>{{ item['namamenu'] }}</li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                    <div class="col-md-2 d-flex justify-content-end">
+                      {% set review_items =
+                      reviews_dict.get(order['order_number'], []) %} {% set
+                      order_items = order['items'] %} {% if review_items|length
+                      == order_items|length %}
+                      <a
+                        href="{{ url_for('nilaiPesanan', order_id=order._id) }}"
+                        class="btn btn-warning"
+                        >Edit</a
+                      >
+                      {% else %}
+                      <a
+                        href="{{ url_for('nilaiPesanan', order_id=order._id) }}"
+                        class="btn btn-primary"
+                        >Nilai</a
+                      >
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="text-center w-100" data-status="selesai">
+          Tidak ada produk yang telah selesai.
+        </p>
+        {% endif %}
+      </div>
     </div>
+  </div>
+  <!-- ======= End of Main Content ======= -->
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var stars = document.querySelectorAll(".star");
+      stars.forEach(function (star) {
+        star.addEventListener("click", function () {
+          var rating = this.getAttribute("data-value");
+          document.getElementById("rating").value = rating;
+          stars.forEach(function (s) {
+            s.classList.remove("fas");
+            s.classList.add("far");
+          });
+          for (var i = 0; i < rating; i++) {
+            stars[i].classList.remove("far");
+            stars[i].classList.add("fas");
+          }
+        });
+      });
+
+      var reviewModal = document.getElementById("nilaiModal");
+      reviewModal.addEventListener("show.bs.modal", function (event) {
+        var button = event.relatedTarget;
+        var orderName = button
+          .closest(".card")
+          .querySelector(".col-md-3").textContent;
+        var orderDescription = "Deskripsi produk " + orderName;
+        var orderPrice = button
+          .closest(".card")
+          .querySelector(".col-md-3 + .col-md-1 + .col-md-3").textContent;
+        var orderNumber = button
+          .closest(".card")
+          .querySelector(".col-md-3").textContent;
+        var reviewId = button.getAttribute("data-review-id");
+        var rating = button.getAttribute("data-rating");
+        var comment = button.getAttribute("data-comment");
+
+        document.getElementById("modalOrderName").textContent = orderName;
+        document.getElementById("modalOrderDescription").textContent =
+          orderDescription;
+        document.getElementById("modalOrderPrice").textContent = orderPrice;
+        document.getElementById("modalOrderNumber").textContent =
+          "No. Pesanan : " + orderNumber;
+        document.getElementById("inputReview").value = comment || "";
+        document.getElementById("rating").value = rating || "0";
+
+        stars.forEach(function (s) {
+          s.classList.remove("fas");
+          s.classList.add("far");
+        });
+        if (rating) {
+          for (var i = 0; i < rating; i++) {
+            stars[i].classList.remove("far");
+            stars[i].classList.add("fas");
+          }
+        }
+
+        var submitButton = document.getElementById("submitReview");
+        if (reviewId) {
+          submitButton.textContent = "Edit";
+          submitButton.setAttribute("data-review-id", reviewId);
+        } else {
+          submitButton.textContent = "Kirim";
+          submitButton.removeAttribute("data-review-id");
+        }
+      });
+
+      document
+        .getElementById("submitReview")
+        .addEventListener("click", function () {
+          var rating = document.getElementById("rating").value;
+          var comment = document.getElementById("inputReview").value;
+          var menuId = document
+            .querySelector('[data-bs-target="#nilaiModal"]')
+            .getAttribute("data-menu-id");
+          var reviewId = this.getAttribute("data-review-id");
+
+          var endpoint = "/submit_review";
+          var method = "POST";
+          if (reviewId) {
+            endpoint = `/edit_review/${reviewId}`;
+            method = "PUT";
+          }
+
+          fetch(endpoint, {
+            method: method,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              menu_id: menuId,
+              rating: rating,
+              comment: comment,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                alert("Review submitted successfully!");
+                location.reload();
+              } else {
+                alert("Failed to submit review: " + data.message);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Failed to submit review.");
+            });
+        });
+    });
+  </script>
+  {% endblock %}
 </div>
-<!-- ======= End of Main Content ======= -->
-
-<!-- Modal -->
-<div class="modal fade mt-5" id="nilaiModal" tabindex="-1" aria-labelledby="nilaiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="nilaiModalLabel">Beri Penilaian</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container text-center mb-5" style="width: 100%;">
-                    <div class="text-start mb-2 d-flex flex-wrap flex-column grid gap-3 p-2" id="container-card">
-                        <h3>Nama Pesanan</h3>
-                        <img src="{{ url_for('static', filename='assets/img/k.jpg') }}" class="img-fluid rounded-start"
-                            alt="name" style="width: 10rem;">
-                        <div class="text-start" style="width: 100%;">
-                            <p>Deskripsi</p>
-                            <p>Rp. xx.xxx</p>
-                            <p>No. Pesanan : xxxxxxx</p>
-                        </div>
-                        <div class="text-center mb-3">
-                            <i class="far fa-star star" data-value="1"></i>
-                            <i class="far fa-star star" data-value="2"></i>
-                            <i class="far fa-star star" data-value="3"></i>
-                            <i class="far fa-star star" data-value="4"></i>
-                            <i class="far fa-star star" data-value="5"></i>
-                        </div>
-                        <input type="hidden" id="rating" name="rating" value="0">
-                        <div class="text-start mb-3" style="width: 100%;">
-                            <label for="inputReview" class="form-label">Tuliskan Komentar Anda</label>
-                            <textarea class="form-control" id="inputReview" rows="3"></textarea>
-                        </div>
-                        <div class="text-center" style="width: 100%;">
-                            <a href="#" class="btn btn-outline-primary" data-bs-dismiss="modal"
-                                aria-label="Close">Batal</a>
-                            <a href="/kirimReview" class="btn btn-primary">Kirim</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
