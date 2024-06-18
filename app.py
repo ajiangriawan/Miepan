@@ -16,6 +16,7 @@ from bson.json_util import dumps
 from bson import ObjectId
 from datetime import datetime
 from flask import jsonify, request
+import random
 
 # Load environment variables
 dotenv_path = join(dirname(__file__), '.env')
@@ -117,13 +118,23 @@ def generate_order_number(user_name):
     order_number = f"{user_name[:2].upper()}{order_date}{order_count + 1}"
     return order_number
 
-
 @app.route('/')
 def index():
     menus = menus_collection.find().limit(3)
+    reviews_cursor = list(reviews_collection.aggregate([{ '$sample': { 'size': 3 } }]))
+    
+    reviews = []
+    for review in reviews_cursor:
+        user = users_collection.find_one({'_id': review['user_id']})
+        review['user_name'] = user['nama'] if user else 'Unknown User'
+        review['user_foto'] = user['fotoprofil']
+        reviews.append(review)
+    
+    random.shuffle(reviews)  # Acak urutan review
+    
     menu_list = list(menus)
     user_role = get_user_role()
-    return render_template('index.html', user_role=user_role, menus=menu_list)
+    return render_template('index.html', user_role=user_role, menus=menu_list, reviews=reviews)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -227,6 +238,7 @@ def tentang():
 @app.route("/pesanan")
 @token_required
 def pesanan(current_user):
+    user_role = get_user_role()
     user_id = current_user['_id']
     belum_dibayar = list(sales_collection.find({'user_id': user_id, 'status': 'belum dibayar'}))
     menunggu_konfirmasi = list(sales_collection.find({'user_id': user_id, 'status': 'menunggu konfirmasi'}))
@@ -243,7 +255,7 @@ def pesanan(current_user):
         else:
             reviews_dict[order_number] = [review]
 
-    return render_template("pesanan.html", user=current_user, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai, reviews_dict=reviews_dict, review=review)
+    return render_template("pesanan.html", user=current_user, user_role=user_role, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai, reviews_dict=reviews_dict, review=review)
 
 @app.route("/bayar")
 @token_required

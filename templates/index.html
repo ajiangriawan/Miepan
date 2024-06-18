@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Dashboard
+Beranda
 {% endblock %}
 
 {% block content%}
 
-<!-- ======= Main Content ======= -->
+<!-- Main Content -->
 <div class="main-content">
     <div class="container text-center mt-2 mb-2">
         <div class="row">
@@ -73,7 +73,7 @@ Dashboard
                                     <h5 class="card-title">{{menu['namamenu']}}</h5>
                                     <p>Rp. {{menu['hargamenu']}},-</p>
                                     <p class="rating">
-                                        ⭐7.4
+                                        ⭐<!--masukan rating dari review yang paling sering muncul-->>
                                     </p>
                                 </div>
                             </div>
@@ -95,59 +95,34 @@ Dashboard
         <a href="/menu" class="btn btn-primary">Lihat Menu Lainnya</a>
     </div>
 </div>
+
+<!-- Reviews Section -->
 <div class="container text-center mt-3 mb-5">
     <div class="container text-center">
         <h3>Kata Pelanggan</h3>
         <br>
     </div>
     <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card">
+        {% for review in reviews %}
         <div class="card mb-3" style="max-width: 16rem;">
             <div class="row g-0">
                 <div class="col-md-4">
-                    <img src="../static/profile_pic/testimonials-2.jpg" class="img-fluid rounded-start" alt="name">
+                    <img src="{{ review.user_foto}}" class="img-fluid rounded-start" alt="{{ review.user_name}}">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h5 class="card-title">Fujika Hiro</h5>
-                        <i class="card-text">Makanannya enak, terus cepet juga pelayananya, pokoknya best deh</i>
-                        <p class="card-text"><small>⭐3.0</small> </p>
-                        <p class="card-text"><small class="text-body-secondary">3 mins ago</small></p>
+                        <h5 class="card-title">{{ review.user_name}}</h5>
+                        <i class="card-text">{{ review.comment }}</i>
+                        <p class="card-text"><small>⭐{{ review.rating }}</small> </p>
+                        <p class="card-text"><small class="text-body-secondary">{{ review.timestamp.strftime("%d %b %Y") }}</small></p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card mb-3" style="max-width: 16rem;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="../static/profile_pic/testimonials-2.jpg" class="img-fluid rounded-start" alt="name">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">Fujika Hiro</h5>
-                        <i class="card-text">Makanannya enak, terus cepet juga pelayananya, pokoknya best deh</i>
-                        <p class="card-text"><small>⭐3.0</small> </p>
-                        <p class="card-text"><small class="text-body-secondary">3 mins ago</small></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card mb-3" style="max-width: 16rem;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="../static/profile_pic/testimonials-2.jpg" class="img-fluid rounded-start" alt="name">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">Fujika Hiro</h5>
-                        <i class="card-text">Makanannya enak, terus cepet juga pelayananya, pokoknya best deh</i>
-                        <p class="card-text"><small>⭐3.0</small> </p>
-                        <p class="card-text"><small class="text-body-secondary">3 mins ago</small></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
+
 <div class="container text-center mt-3 mb-5">
     <div class="container text-center">
         <h3>Media</h3>
@@ -156,49 +131,17 @@ Dashboard
     <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card">
         <div class="card h-100" style="width: 16rem;">
             <img src="../static/assets/img/album1.jpg" class="card-img-top" alt="menu">
-            <!--<div class="card-body">
-                <div class="container text-start">
-                    <div class="row">
-                        <div class="col">
-                            <p class="card-title">Kami buka setiap hari kecuali hari senin yaa, buka dari pukul 17.00 -
-                                22.30 😊</p>
-                            <i class="card-text">21-10-2023</i>
-                        </div>
-                    </div>
-                </div>
-            </div>-->
         </div>
         <div class="card h-100" style="width: 16rem;">
             <video src="../static/assets/video/Uncle @jordionsu sekali coba langsung ketagihan yaa.mp4"
                 class=" object-fit-contain" controls></video>
-            <!--<div class="card-body">
-                <div class="container text-start">
-                    <div class="row">
-                        <div class="col">
-                            <p class="card-title">Kami buka setiap hari kecuali hari senin yaa, buka dari pukul 17.00 -
-                                22.30 😊</p>
-                            <i class="card-text">21-10-2023</i>
-                        </div>
-                    </div>
-                </div>
-            </div>-->
+
         </div>
         <div class="card h-100" style="width: 16rem;">
-            <img src="../static/assets/img/album1.jpg" class="card-img-top" alt="menu">
-            <!--<div class="card-body">
-                <div class="container text-start">
-                    <div class="row">
-                        <div class="col">
-                            <p class="card-title">Kami buka setiap hari kecuali hari senin yaa, buka dari pukul 17.00 -
-                                22.30 😊</p>
-                            <i class="card-text">21-10-2023</i>
-                        </div>
-                    </div>
-                </div>
-            </div>-->
+            <img src="../static/assets/img/album1.jpg" class="card-img-top" alt="menu">            
         </div>
     </div>
 </div>
-<!-- ======= End of Main Content ======= -->
+<!-- End of Main Content -->
 
 {% endblock %}
