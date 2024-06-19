@@ -118,6 +118,15 @@ def generate_order_number(user_name):
     order_number = f"{user_name[:2].upper()}{order_date}{order_count + 1}"
     return order_number
 
+def format_rupiah(value):
+    try:
+        value = float(value)
+        return f"Rp {value:,.0f}".replace(",", ".")
+    except (ValueError, TypeError):
+        return "Rp 0"  # atau nilai default yang sesuai jika tidak bisa dikonversi
+
+app.jinja_env.filters['rupiah'] = format_rupiah
+
 @app.route('/')
 def index():
     menus = menus_collection.find().limit(3)
@@ -134,6 +143,33 @@ def index():
     
     menu_list = list(menus)
     user_role = get_user_role()
+
+    # Mengambil semua review
+    reviews = list(reviews_collection.find())
+    
+    # Menghitung rating rata-rata untuk setiap menu
+    menu_ratings = {}
+    for review in reviews:
+        menu_id = review['menu_id']
+        rating = review['rating']
+        
+        menu_id = str(menu_id)
+        
+        if menu_id in menu_ratings:
+            menu_ratings[menu_id]['total_rating'] += rating
+            menu_ratings[menu_id]['count'] += 1
+        else:
+            menu_ratings[menu_id] = {'total_rating': rating, 'count': 1}
+    
+    for menu in menu_list:
+        menu_id = str(menu['_id'])
+        if menu_id in menu_ratings:
+            total_rating = menu_ratings[menu_id]['total_rating']
+            count = menu_ratings[menu_id]['count']
+            menu['average_rating'] = total_rating / count
+        else:
+            menu['average_rating'] = None
+
     return render_template('index.html', user_role=user_role, menus=menu_list, reviews=reviews)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -203,9 +239,36 @@ def menu():
         menus = menus_collection.find({'kategorimenu': category})
     else:
         menus = menus_collection.find()
+    
     menu_list = list(menus)
     user_role = get_user_role()
-
+    
+    # Mengambil semua review
+    reviews = list(reviews_collection.find())
+    
+    # Menghitung rating rata-rata untuk setiap menu
+    menu_ratings = {}
+    for review in reviews:
+        menu_id = review['menu_id']
+        rating = review['rating']
+        
+        menu_id = str(menu_id)
+        
+        if menu_id in menu_ratings:
+            menu_ratings[menu_id]['total_rating'] += rating
+            menu_ratings[menu_id]['count'] += 1
+        else:
+            menu_ratings[menu_id] = {'total_rating': rating, 'count': 1}
+    
+    for menu in menu_list:
+        menu_id = str(menu['_id'])
+        if menu_id in menu_ratings:
+            total_rating = menu_ratings[menu_id]['total_rating']
+            count = menu_ratings[menu_id]['count']
+            menu['average_rating'] = total_rating / count
+        else:
+            menu['average_rating'] = None
+    
     categories = list(categories_collection.find())  # Get categories from the categories collection
     return render_template("menu.html", user_role=user_role, menus=menu_list, categories=categories)
 
@@ -227,8 +290,28 @@ def detailMenu(menu_id):
             different_category_menu = None  # Handle case where no other categories are available
     else:
         different_category_menu = None
+
+    # Mengambil semua review untuk menu tertentu
+    reviews_cursor = reviews_collection.find({'menu_id': ObjectId(menu_id)})
     
-    return render_template("detail_menu.html", user_role=user_role, menu=menu, different_category_menu=different_category_menu)
+    reviews = []
+    total_rating = 0
+    count = 0
+    
+    for review in reviews_cursor:
+        user = users_collection.find_one({'_id': review['user_id']})
+        review['user_name'] = user['nama'] if user else 'Unknown User'
+        review['user_foto'] = user['fotoprofil']
+        reviews.append(review)
+        total_rating += review['rating']
+        count += 1
+    
+    average_rating = total_rating / count if count > 0 else None
+    
+    # Menambahkan rating ke menu
+    menu['average_rating'] = average_rating
+
+    return render_template("detail_menu.html", user_role=user_role, menu=menu, different_category_menu=different_category_menu, reviews=reviews)
 
 @app.route("/tentang")
 def tentang():

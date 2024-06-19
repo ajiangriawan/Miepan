@@ -68,13 +68,20 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title">{{menu['namamenu']}}</h5>
-                  <p>Rp. {{menu['hargamenu']}},-</p>
-                  <p class="rating">⭐7.4</p>
+                  <p>{{menu['hargamenu']|rupiah}}</p>
+                  <p class="rating">
+                    ⭐ {% if menu['average_rating'] %} {{ menu['average_rating']
+                    }} {% else %} Belum ada rating {% endif %}
+                  </p>
                 </div>
               </div>
               <div class="col text-start d-flex justify-content-evenly mb-3">
                 <form action="/keranjang/{{ menu['_id'] }}" method="post">
-                  <button type="submit" class="btn btn-primary" style="width: 10rem;">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="width: 10rem"
+                  >
                     <i class="material-symbols-outlined"> add_shopping_cart </i>
                   </button>
                 </form>

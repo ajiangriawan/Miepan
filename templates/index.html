@@ -71,16 +71,17 @@ Beranda
                             <div class="row">
                                 <div class="col">
                                     <h5 class="card-title">{{menu['namamenu']}}</h5>
-                                    <p>Rp. {{menu['hargamenu']}},-</p>
+                                    <p>{{menu['hargamenu']|rupiah}}</p>
                                     <p class="rating">
-                                        ⭐<!--masukan rating dari review yang paling sering muncul-->>
+                                        ⭐ {% if menu['average_rating'] %} {{ menu['average_rating']}} {% else %} Belum
+                                        ada rating {% endif %}
                                     </p>
                                 </div>
                             </div>
                             <div class="col text-start d-flex justify-content-evenly mb-3">
                                 <form action="/keranjang/{{ menu['_id'] }}" method="post">
                                     <button type="submit" class="btn btn-primary" style="width: 10rem;">
-                                      <i class="material-symbols-outlined"> add_shopping_cart </i>
+                                        <i class="material-symbols-outlined"> add_shopping_cart </i>
                                     </button>
                                 </form>
                             </div>
@@ -114,7 +115,8 @@ Beranda
                         <h5 class="card-title">{{ review.user_name}}</h5>
                         <i class="card-text">{{ review.comment }}</i>
                         <p class="card-text"><small>⭐{{ review.rating }}</small> </p>
-                        <p class="card-text"><small class="text-body-secondary">{{ review.timestamp.strftime("%d %b %Y") }}</small></p>
+                        <p class="card-text"><small class="text-body-secondary">{{ review.timestamp.strftime("%d %b %Y")
+                                }}</small></p>
                     </div>
                 </div>
             </div>
@@ -138,7 +140,7 @@ Beranda
 
         </div>
         <div class="card h-100" style="width: 16rem;">
-            <img src="../static/assets/img/album1.jpg" class="card-img-top" alt="menu">            
+            <img src="../static/assets/img/album1.jpg" class="card-img-top" alt="menu">
         </div>
     </div>
 </div>
