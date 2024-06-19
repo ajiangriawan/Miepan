@@ -121,27 +121,32 @@ app.jinja_env.filters['rupiah'] = format_rupiah
 
 @app.route('/')
 def index():
+    user_role = get_user_role()
     menus = menus_collection.find().limit(3)
     reviews_cursor = list(reviews_collection.aggregate([{ '$sample': { 'size': 3 } }]))
     
     reviews = []
     for review in reviews_cursor:
-        user = users_collection.find_one({'_id': review['user_id']})
-        review['user_name'] = user['nama'] if user else 'Unknown User'
-        review['user_foto'] = user['fotoprofil']
+        user_id = review.get('user_id')
+        if user_id:
+            user = users_collection.find_one({'_id': ObjectId(user_id)})
+            review['user_name'] = user['nama'] if user else 'Unknown User'
+            review['user_foto'] = user['fotoprofil'] if user and 'fotoprofil' in user else 'default.png'
+        else:
+            review['user_name'] = 'Unknown User'
+            review['user_foto'] = 'default.png'
         reviews.append(review)
     
     random.shuffle(reviews)  # Acak urutan review
     
     menu_list = list(menus)
-    user_role = get_user_role()
 
     # Mengambil semua review
-    reviews = list(reviews_collection.find())
+    all_reviews = list(reviews_collection.find())
     
     # Menghitung rating rata-rata untuk setiap menu
     menu_ratings = {}
-    for review in reviews:
+    for review in all_reviews:
         menu_id = review['menu_id']
         rating = review['rating']
         
@@ -291,7 +296,7 @@ def detailMenu(menu_id):
     count = 0
     
     for review in reviews_cursor:
-        user = users_collection.find_one({'_id': review['user_id']})
+        user = users_collection.find_one({'_id':  ObjectId(review['user_id'])})
         review['user_name'] = user['nama'] if user else 'Unknown User'
         review['user_foto'] = user['fotoprofil']
         reviews.append(review)

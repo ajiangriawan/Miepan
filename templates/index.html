@@ -105,23 +105,26 @@ Beranda
     </div>
     <div class="text-start mt-2 mb-2 d-flex flex-wrap flex-row grid gap-3" id="container-card">
         {% for review in reviews %}
-        <div class="card mb-3" style="max-width: 16rem;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="{{ review.user_foto}}" class="img-fluid rounded-start" alt="{{ review.user_name}}">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ review.user_name}}</h5>
-                        <i class="card-text">{{ review.comment }}</i>
-                        <p class="card-text"><small>⭐{{ review.rating }}</small> </p>
-                        <p class="card-text"><small class="text-body-secondary">{{ review.timestamp.strftime("%d %b %Y")
-                                }}</small></p>
-                    </div>
-                </div>
+      <div class="card mb-3" style="max-width: 540px">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{review['user_foto']}}" class="img-fluid rounded-start" alt="{{ review['user_name'] }}">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ review['user_name'] }}</h5>
+              <i class="card-text">{{ review['comment'] }}</i>
+              <p class="card-text"><small>⭐{{ review['rating'] }}</small></p>
+              <p class="card-text">
+                <small class="text-body-secondary"
+                  >{{ review.timestamp.strftime("%d %b %Y") }}</small
+                >
+              </p>
             </div>
+          </div>
         </div>
-        {% endfor %}
+      </div>
+      {% endfor %}
     </div>
 </div>
 
