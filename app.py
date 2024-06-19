@@ -54,14 +54,6 @@ categories_collection = db.categories
 carts_collection = db.carts
 reviews_collection = db.reviews
 
-def generate_fake_sales_data(num_days):
-    sales_data = []
-    base_date = datetime.now()
-    for i in range(num_days):
-        date = (base_date - timedelta(days=i)).strftime('%Y-%m-%d')
-        sales = random.randint(50, 150)
-        sales_data.append({"date": date, "sales": sales})
-    return sales_data
 
 def token_required(f):
     @wraps(f)
@@ -568,26 +560,26 @@ def editProfil(current_user):
     return render_template("edit_profil.html", user=current_user, user_role=user_role)
 
 @app.route("/dashboard")
-@admin_required
+@token_required
 def dashboard(current_user):
     user_role = get_user_role()
 
-    # Agregasi untuk menghitung total penjualan dan total item
+    # Query to calculate total sales and total items for completed orders
     pipeline_total_sales = [
-        {
-            '$group': {
-                '_id': None,
-                'total_sales': {'$sum': '$total_amount'},
-                'total_items': {'$sum': {'$sum': '$items.quantity'}}
-            }
-        }
+        {'$match': {'status': 'selesai'}},  # Filter by status 'selesai'
+        {'$group': {
+            '_id': None,
+            'total_sales': {'$sum': '$total_amount'},
+            'total_items': {'$sum': {'$sum': '$items.quantity'}}
+        }}
     ]
 
-    # Eksekusi pipeline
+    # Execute aggregation pipeline
     sales_aggregate = list(sales_collection.aggregate(pipeline_total_sales))
     total_sales = sales_aggregate[0]['total_sales'] if sales_aggregate else 0
     total_items = sales_aggregate[0]['total_items'] if sales_aggregate else 0
 
+    # Fetch users and menus count
     users = users_collection.find()
     menus = menus_collection.find()
     user_list = list(users)
@@ -596,10 +588,12 @@ def dashboard(current_user):
     total_menus = len(menu_list)
     count_per_role = defaultdict(int)
 
+    # Count users per role
     for user in user_list:
         role = user.get('role', 'Uncategorized')
         count_per_role[role] += 1
 
+    # Render dashboard template with variables
     return render_template("dashboard.html", user_role=user_role,
                            total_sales=total_sales,
                            total_items=total_items,
@@ -686,6 +680,23 @@ def hapusMenu(current_user, menu_id):
 @admin_required
 def kelolaPesanan(current_user):
     user_role = get_user_role()
+    
+    # Calculate the counts for different periods
+    today = datetime.now().date()
+    start_of_week = today - timedelta(days=today.weekday())
+    start_of_month = today.replace(day=1)
+    start_of_year = today.replace(month=1, day=1)
+
+    today_datetime = datetime.combine(today, datetime.min.time())
+    start_of_week_datetime = datetime.combine(start_of_week, datetime.min.time())
+    start_of_month_datetime = datetime.combine(start_of_month, datetime.min.time())
+    start_of_year_datetime = datetime.combine(start_of_year, datetime.min.time())
+
+    daily_orders = sales_collection.count_documents({'order_date': {'$gte': today_datetime}})
+    weekly_orders = sales_collection.count_documents({'order_date': {'$gte': start_of_week_datetime}})
+    monthly_orders = sales_collection.count_documents({'order_date': {'$gte': start_of_month_datetime}})
+    yearly_orders = sales_collection.count_documents({'order_date': {'$gte': start_of_year_datetime}})
+
     menunggu_konfirmasi = list(sales_collection.find({'status': 'menunggu konfirmasi'}))
     proses = list(sales_collection.find({'status': 'proses'}))
     selesai = list(sales_collection.find({'status': 'selesai'}))
@@ -705,11 +716,22 @@ def kelolaPesanan(current_user):
     proses = convert_to_string(proses)
     selesai = convert_to_string(selesai)
     
-    return render_template("kelola_pesanan.html", user=current_user, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai)
+    return render_template(
+        "kelola_pesanan.html", 
+        user=current_user, 
+        menunggu_konfirmasi=menunggu_konfirmasi, 
+        proses=proses, 
+        selesai=selesai,
+        daily_orders=daily_orders,
+        weekly_orders=weekly_orders,
+        monthly_orders=monthly_orders,
+        yearly_orders=yearly_orders
+    )
 
 @app.route('/detailPesanan/<order_id>', methods=['GET'])
 @token_required
 def detailPesanan(current_user, order_id):
+    user_role = get_user_role()
     order = sales_collection.find_one({'_id': ObjectId(order_id)})
     if order:
         # Konversi ObjectId ke string dan memastikan items adalah list
@@ -731,7 +753,7 @@ def detailPesanan(current_user, order_id):
         # Debug print untuk memastikan items adalah list
         print("Order Items: ", order['items'])
         
-        return render_template('detail_pesanan.html', order=order, items=items)
+        return render_template('detail_pesanan.html', order=order, items=items, user_role=user_role)
     else:
         flash('Order not found.', 'danger')
         return redirect(url_for('kelolaPesanan'))
@@ -739,6 +761,7 @@ def detailPesanan(current_user, order_id):
 @app.route('/strukPesanan/<order_id>', methods=['GET'])
 @token_required
 def strukPesanan(current_user, order_id):
+    user_role = get_user_role()
     order = sales_collection.find_one({'_id': ObjectId(order_id)})
     if order:
         # Konversi ObjectId ke string dan memastikan items adalah list
@@ -760,7 +783,7 @@ def strukPesanan(current_user, order_id):
         # Debug print untuk memastikan items adalah list
         print("Order Items: ", order['items'])
         
-        return render_template('struk.html', order=order, items=items)
+        return render_template('struk.html', order=order, items=items, user_role=user_role)
     else:
         flash('Order not found.', 'danger')
         return redirect(url_for('kelolaPesanan'))
@@ -923,18 +946,63 @@ def kelolaRekening(current_user):
 @admin_required
 def kelolaAdmin(current_user):
     user_role = get_user_role()
-    return render_template("kelola_admin.html", user_role=user_role)
+    admins = users_collection.find({'role': 'admin'})
+    return render_template("kelola_admin.html", user_role=user_role, admins=admins)
 
-@app.route('/sales_data')
-def sales_data():
-    period = request.args.get('period', 'weekly')
-    if period == 'weekly':
-        sales = generate_fake_sales_data(7)
-    elif period == 'monthly':
-        sales = generate_fake_sales_data(30)
-    elif period == 'yearly':
-        sales = generate_fake_sales_data(365)
-    return jsonify(sales)
+@app.route("/tambahAdmin", methods=['POST'])
+@admin_required
+def tambahAdmin(current_user):
+    email = request.form['email']
+    nama = request.form['nama']
+    notlp = request.form['notlp']
+    alamat = request.form['alamat']
+    password = hashlib.sha256('defaultpassword'.encode()).hexdigest()  # Default password for new admin
+
+    if users_collection.find_one({'email': email}):
+        flash('Email sudah terdaftar', 'danger')
+        return redirect(url_for('kelolaAdmin'))
+
+    new_admin = {
+        'email': email,
+        'password': password,
+        'nama': nama,
+        'notlp': notlp,
+        'alamat': alamat,
+        'fotoprofil': 'static/img/profil/profil.png',  # Default profile picture
+        'role': 'admin',
+    }
+    users_collection.insert_one(new_admin)
+    flash('Admin berhasil ditambahkan', 'success')
+    return redirect(url_for('kelolaAdmin'))
+
+@app.route("/updateAdmin/<admin_id>", methods=['POST'])
+@admin_required
+def updateAdmin(current_user, admin_id):
+    email = request.form['email']
+    nama = request.form['nama']
+    notlp = request.form['notlp']
+    alamat = request.form['alamat']
+
+    users_collection.update_one(
+        {'_id': ObjectId(admin_id)},
+        {
+            '$set': {
+                'email': email,
+                'nama': nama,
+                'notlp': notlp,
+                'alamat': alamat
+            }
+        }
+    )
+    flash('Admin berhasil diperbarui', 'success')
+    return redirect(url_for('kelolaAdmin'))
+
+@app.route("/hapusAdmin/<admin_id>")
+@admin_required
+def hapusAdmin(current_user, admin_id):
+    users_collection.delete_one({'_id': ObjectId(admin_id)})
+    flash('Admin berhasil dihapus', 'success')
+    return redirect(url_for('kelolaAdmin'))
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=5000, debug=True)

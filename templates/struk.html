@@ -1,15 +1,14 @@
-{% extends 'sidenav.html' %}
-
-{% block title %}
-Struk Pesanan
-{% endblock %}
-
-{% block content %}
+{% if user_role == 'admin' %} {% extends 'sidenav.html' %} {% endif %} {% if
+user_role == 'pelanggan' %} {% extends 'base.html' %} {% endif %} {% block title
+%} Struk Pesanan {% endblock %} {% block content %}
 <div class="receipt mt-5">
   <!-- Header -->
   <div class="receipt-header">
     <h2>Miepan</h2>
-    <p>Jl. Cendrawasih Raya No.1, Kayuringin Jaya, Kec. Bekasi Sel., Kota Bks, DKI Jakarta</p>
+    <p>
+      Jl. Cendrawasih Raya No.1, Kayuringin Jaya, Kec. Bekasi Sel., Kota Bks,
+      DKI Jakarta
+    </p>
     <p>Telepon: 087809876543</p>
   </div>
 
@@ -65,15 +64,22 @@ Struk Pesanan
   </div>
 </div>
 <!-- Print Button -->
-<div class="container">
+<div class="container d-flex flex-wrap mt-2">
+  {% if user_role == 'pelanggan' %}
+  <a style="width: 100%;" href="{{ url_for('pesanan') }}" class="btn btn-outline-primary"
+    >Kembali</a
+  >
+  {% endif %} {% if user_role == 'admin' %}
+  <a style="width: 100%;" href="{{ url_for('kelolaPesanan') }}" class="btn btn-outline-primary"
+    >Kembali</a
+  >{% endif %}
   <button class="btn btn-primary btn-print" onclick="printReceipt()">
     Cetak Struk
   </button>
 </div>
-
 <script>
   function printReceipt() {
-    const printContent = document.querySelector('.receipt').outerHTML;
+    const printContent = document.querySelector(".receipt").outerHTML;
     const originalContent = document.body.innerHTML;
 
     document.body.innerHTML = printContent;

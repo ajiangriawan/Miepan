@@ -20,53 +20,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
   });
 });
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  const ctx = document.getElementById("salesChart").getContext("2d");
-  let salesChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: [
-        {
-          label: "Penjualan",
-          data: [],
-          backgroundColor: "#eeeeee",
-          borderColor: "#d31a20",
-          borderWidth: 1,
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-        },
-      },
-    },
-  });
-
-  function fetchData(period) {
-    fetch(`/sales_data?period=${period}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const labels = data.map((item) => item.date);
-        const salesData = data.map((item) => item.sales);
-
-        salesChart.data.labels = labels;
-        salesChart.data.datasets[0].data = salesData;
-        salesChart.update();
-      });
-  }
-
-  window.updateChart = function (period) {
-    fetchData(period);
-  };
-
-  // Load initial data for weekly view
-  fetchData("weekly");
-});
-
 function filterCategory(category) {
   let cards = document.querySelectorAll(".menu-card");
   cards.forEach((card) => {

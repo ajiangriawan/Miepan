@@ -1,10 +1,5 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Pesanan
-{% endblock %}
-
-{% block content%}
+{% extends 'base.html' %} {% block title %} Pesanan {% endblock %} {% block
+content%}
 
 <!-- ======= Main Content ======= -->
 <div class="container text-center mt-3 mb-5">
@@ -70,13 +65,15 @@ Pesanan
                   <div
                     class="row align-items-center justify-content-center text-start"
                   >
-                    <div class="col-md-3 d-flex flex-column justify-content-start">
+                    <div
+                      class="col-md-3 d-flex flex-column justify-content-start"
+                    >
                       <p><strong>No Pesanan:</strong></p>
                       {{ order['order_number'] }}
                     </div>
                     <div class="col-md-3">
                       <p><strong>Total Harga:</strong></p>
-                      Rp. {{ order['total_amount'] }}
+                      {{ order['total_amount']|rupiah }}
                     </div>
                     <div class="col-md-2 d-flex justify-content-end">
                       <a
@@ -116,7 +113,9 @@ Pesanan
                     class="row align-items-center justify-content-center text-start"
                   >
                     <div class="col-md-3">{{ order['order_number'] }}</div>
-                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-3">
+                      {{ order['total_amount']|rupiah }}
+                    </div>
                     <div class="col-md-2"><i>Menunggu Konfirmasi</i></div>
                   </div>
                 </div>
@@ -149,7 +148,9 @@ Pesanan
                     class="row align-items-center justify-content-center text-start"
                   >
                     <div class="col-md-3">{{ order['order_number'] }}</div>
-                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-3">
+                      {{ order['total_amount']|rupiah }}
+                    </div>
                     <div class="col-md-2"><i>Proses</i></div>
                   </div>
                 </div>
@@ -182,24 +183,20 @@ Pesanan
                     class="row align-items-center justify-content-center text-start"
                   >
                     <div class="col-md-3">{{ order['order_number'] }}</div>
-                    <div class="col-md-3">Rp. {{ order['total_amount'] }}</div>
+                    <div class="col-md-3">
+                      {{ order['total_amount']|rupiah }}
+                    </div>
                     <div class="col-md-2 d-flex justify-content-end">
-                      {% set review_items =
-                      reviews_dict.get(order['order_number'], []) %} {% set
-                      order_items = order['items'] %} {% if review_items|length
-                      == order_items|length %}
                       <a
-                        href="{{ url_for('nilaiPesanan', order_id=order._id) }}"
-                        class="btn btn-warning"
-                        >Edit</a
+                        href="{{ url_for('detailPesanan', order_id=order._id) }}"
+                        class="me-2 btn btn-primary"
+                        >Detail</a
                       >
-                      {% else %}
                       <a
-                        href="{{ url_for('nilaiPesanan', order_id=order._id) }}"
-                        class="btn btn-primary"
-                        >Nilai</a
+                        href="{{ url_for('strukPesanan', order_id=order._id) }}"
+                        class="me-2 btn btn-outline-primary"
+                        >Struk</a
                       >
-                      {% endif %}
                     </div>
                   </div>
                 </div>

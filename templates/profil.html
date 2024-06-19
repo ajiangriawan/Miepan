@@ -1,4 +1,11 @@
-{% extends 'base.html' %}
+{% if user_role == 'admin' %}
+
+{% extends 'sidenav.html' %} 
+{% endif %}
+{% if user_role == 'pelanggan' %}
+
+{% extends 'base.html' %} 
+{% endif %}
 
 {% block title %}
 Dashboard

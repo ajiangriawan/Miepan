@@ -1,10 +1,6 @@
-{% extends 'sidenav.html' %} 
-
-{% block title %} 
-Detail Pesanan 
-{% endblock %}
-
-{% block content %}
+{% if user_role == 'admin' %} {% extends 'sidenav.html' %} {% endif %} {% if
+user_role == 'pelanggan' %} {% extends 'base.html' %} {% endif %} {% block title
+%} Detail Pesanan {% endblock %} {% block content %}
 
 <div class="container">
   <h2 class="mb-3">Detail Pesanan</h2>
@@ -16,7 +12,7 @@ Detail Pesanan
       <div class="row">
         <div class="col">
           <p><strong>Nama Pemesan:</strong> {{ order.user_name }}</p>
-          <p><strong>Total Harga:</strong> Rp. {{ order.total_amount }}</p>
+          <p><strong>Total Harga:</strong> {{ order.total_amount|rupiah  }}</p>
           <p><strong>Metode Pembayaran:</strong> {{ order.payment_method }}</p>
           <p><strong>Status:</strong> {{ order.status }}</p>
           <p><strong>Tanggal Pesanan:</strong> {{ order.order_date }}</p>
@@ -24,8 +20,8 @@ Detail Pesanan
           <ul>
             {% for item in items %}
             <li>
-              {{ item.namamenu }} - {{ item.quantity }} pcs - Rp. {{
-              item.hargamenu }}
+              {{ item.namamenu }} - {{ item.quantity }} pcs - {{
+              item.hargamenu|rupiah }}
             </li>
             {% endfor %}
           </ul>
@@ -46,11 +42,26 @@ Detail Pesanan
       </div>
     </div>
     <div class="card-footer d-flex flex-wrap justify-content-end">
-      <a href="{{ url_for('pesanan') }}" class="btn btn-outline-primary me-2">Kembali</a>
-      {% if user_role == 'admin' %}
-      <a href="{{ url_for('kelolaPesanan') }}" class="btn btn-outline-primary me-2">Kembali</a>
-      <a href="{{ url_for('kelolaPesanan') }}" class="btn btn-outline-secondary me-2">Tolak</a>
-      <a href="{{ url_for('prosesPesanan', order_id=order._id) }}" class="btn btn-primary">Proses</a>
+      {% if user_role == 'pelanggan' %}
+      <a href="{{ url_for('pesanan') }}" class="btn btn-outline-primary me-2"
+        >Kembali</a
+      >
+      {% endif %} {% if user_role == 'admin' %}
+      <a
+        href="{{ url_for('kelolaPesanan') }}"
+        class="btn btn-outline-primary me-2"
+        >Kembali</a
+      >
+      <a
+        href="{{ url_for('kelolaPesanan') }}"
+        class="btn btn-outline-secondary me-2"
+        >Tolak</a
+      >
+      <a
+        href="{{ url_for('prosesPesanan', order_id=order._id) }}"
+        class="btn btn-primary"
+        >Proses</a
+      >
       {% endif %}
     </div>
   </div>

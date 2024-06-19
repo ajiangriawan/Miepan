@@ -1,60 +1,58 @@
-{% extends 'sidenav.html' %} 
+{% extends 'sidenav.html' %}
 
-{% block title %}
-Dashboard
-{% endblock %}
+{% block title %} Dashboard {% endblock %}
 
 {% block content %}
-
-<!-- ======= Main Content ======= -->
+<!-- Main Content -->
 <div class="container text-center mb-5">
-    <div class="container text-start">
-        <h3>Dashboard</h3>
-        <br>
+  <div class="container text-start mt-5">
+    <h3>Dashboard</h3>
+    <br />
+  </div>
+  <div class="row" style="width: 100%">
+    <!-- Cards -->
+    <div class="col d-flex justify-content-center text-start">
+      <div class="card mb-3" style="width: 12rem" id="card-info">
+        <div class="card-header">Total Penjualan</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ total_sales|rupiah }}</h5>
+        </div>
+      </div>
     </div>
-    <div class="row" style="width: 100%;">
-        <div class="col d-flex justify-content-center text-start">
-            <div class="card mb-3" style="width: 12rem;" id="card-info">
-                <div class="card-header">Total Penjualan</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ total_sales }}</h5>
-                </div>
-            </div>
+    <div class="col d-flex justify-content-center text-start">
+      <div class="card mb-3" style="width: 12rem" id="card-info">
+        <div class="card-header">Total Menu</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ total_menus }}</h5>
         </div>
-        <div class="col d-flex justify-content-center text-start">
-            <div class="card mb-3" style="width: 12rem;" id="card-info">
-                <div class="card-header">Total Menu</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ total_menus }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col d-flex justify-content-center text-start">
-            <div class="card mb-3" style="width: 12rem;" id="card-info">
-                <div class="card-header">Total Admin</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ count_per_role['admin'] }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col d-flex justify-content-center text-start">
-            <div class="card mb-3" style="width: 12rem;" id="card-info">
-                <div class="card-header">Total Pengguna</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ count_per_role['pelanggan'] }}</h5>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    <div class="container mt-3">
-        <h4 class="text-center">Grafik Penjualan</h4>
-        <div class="text-center mb-3">
-            <button class="btn btn-primary" onclick="updateChart('weekly')">Mingguan</button>
-            <button class="btn btn-primary" onclick="updateChart('monthly')">Bulanan</button>
-            <button class="btn btn-primary" onclick="updateChart('yearly')">Tahunan</button>
+    <div class="col d-flex justify-content-center text-start">
+      <div class="card mb-3" style="width: 12rem" id="card-info">
+        <div class="card-header">Total Admin</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ count_per_role['admin'] }}</h5>
         </div>
-        <canvas id="salesChart"></canvas>
+      </div>
     </div>
+    <div class="col d-flex justify-content-center text-start">
+      <div class="card mb-3" style="width: 12rem" id="card-info">
+        <div class="card-header">Total Pengguna</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ count_per_role['pelanggan'] }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container text-center mt-5">
+    <h2>Selamat Datang</h2>
+    <h4>Jangan Lupa Berdoa dan Selamat Bekerja</h4>
+    <br />
+  </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 {% endblock %}

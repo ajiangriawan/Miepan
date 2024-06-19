@@ -52,6 +52,11 @@ header {
   background: linear-gradient(to bottom, #eeeeee 70%, #fefefe);
 }
 
+
+.nav-tabs .nav-link {
+  border: solid 1px var(--bs-red-a);
+}
+
 .btn-primary {
   color: var(--bs-white-a);
   background-color: var(--bs-red-a);

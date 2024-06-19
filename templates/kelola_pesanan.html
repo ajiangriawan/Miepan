@@ -12,7 +12,7 @@ block content %}
       <div class="card mb-3" style="width: 12rem" id="card-info">
         <div class="card-header">Pesanan Harian</div>
         <div class="card-body">
-          <h5 class="card-title">12</h5>
+          <h5 class="card-title">{{ daily_orders }}</h5>
         </div>
       </div>
     </div>
@@ -20,7 +20,7 @@ block content %}
       <div class="card mb-3" style="width: 12rem" id="card-info">
         <div class="card-header">Pesanan Mingguan</div>
         <div class="card-body">
-          <h5 class="card-title">13</h5>
+          <h5 class="card-title">{{ weekly_orders }}</h5>
         </div>
       </div>
     </div>
@@ -28,7 +28,7 @@ block content %}
       <div class="card mb-3" style="width: 12rem" id="card-info">
         <div class="card-header">Pesanan Bulanan</div>
         <div class="card-body">
-          <h5 class="card-title">1</h5>
+          <h5 class="card-title">{{ monthly_orders }}</h5>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@ block content %}
       <div class="card mb-3" style="width: 12rem" id="card-info">
         <div class="card-header">Pesanan Tahunan</div>
         <div class="card-body">
-          <h5 class="card-title">123</h5>
+          <h5 class="card-title">{{ yearly_orders }}</h5>
         </div>
       </div>
     </div>
@@ -111,7 +111,7 @@ block content %}
                         {{ order['order_number'] }}
                       </div>
                       <div class="col-md-3">
-                        Rp. {{ order['total_amount'] }}
+                        {{ order['total_amount']|rupiah }}
                       </div>
                     </div>
                   </div>
@@ -154,7 +154,7 @@ block content %}
                         {{ order['order_number'] }}
                       </div>
                       <div class="col-md-3">
-                        Rp. {{ order['total_amount'] }}
+                        {{ order['total_amount']|rupiah }}
                       </div>
                     </div>
                   </div>
@@ -202,7 +202,7 @@ block content %}
                         {{ order['order_number'] }}
                       </div>
                       <div class="col-md-3">
-                        Rp. {{ order['total_amount'] }}
+                        {{ order['total_amount']|rupiah }}
                       </div>
                     </div>
                   </div>
@@ -210,8 +210,13 @@ block content %}
               </div>
               <div class="col-md-2 d-flex justify-content-end">
                 <a
-                  href="{{ url_for('strukPesanan', order_id=order._id) }}"
+                  href="{{ url_for('detailPesanan', order_id=order._id) }}"
                   class="me-2 btn btn-primary"
+                  >Detail</a
+                >
+                <a
+                  href="{{ url_for('strukPesanan', order_id=order._id) }}"
+                  class="me-2 btn btn-outline-primary"
                   >Struk</a
                 >
               </div>
