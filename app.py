@@ -565,7 +565,7 @@ def editProfil(current_user):
     return render_template("edit_profil.html", user=current_user, user_role=user_role)
 
 @app.route("/dashboard")
-@token_required
+@admin_required
 def dashboard(current_user):
     user_role = get_user_role()
 
@@ -940,12 +940,6 @@ def edit_review(current_user, review_id):
     menus_collection.update_one({'_id': ObjectId(menu_id)}, {'$set': {'average_rating': average_rating}})
 
     return jsonify({'success': True, 'message': 'Review edited successfully.'})
-
-@app.route("/kelolaRekening")
-@admin_required
-def kelolaRekening(current_user):
-    user_role = get_user_role()
-    return render_template("kelola_rekening.html", user_role=user_role)
 
 @app.route("/kelolaAdmin")
 @admin_required
