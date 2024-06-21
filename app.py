@@ -376,10 +376,11 @@ def add_to_cart(current_user, menu_id):
             )
             flash('Jumlah item di keranjang diperbarui', 'success')
         else:
+            quantity = request.form.get('quantity', default=1, type=int)
             cart_item = {
                 'user_id': current_user['_id'],
                 'menu_id': menu['_id'],
-                'quantity': 1,
+                'quantity': quantity,
                 'namamenu': menu['namamenu'],
                 'hargamenu': menu['hargamenu'],
                 'fotomenu': menu['fotomenu'],
@@ -568,7 +569,9 @@ def editProfil(current_user):
 @admin_required
 def dashboard(current_user):
     user_role = get_user_role()
+    sales = sales_collection.find({'status': 'selesai'}).sort('created_at', DESCENDING).limit(5)
 
+    sales_list = list(sales)
     # Query to calculate total sales and total items for completed orders
     pipeline_total_sales = [
         {'$match': {'status': 'selesai'}},  # Filter by status 'selesai'
@@ -603,7 +606,8 @@ def dashboard(current_user):
                            total_sales=total_sales,
                            total_items=total_items,
                            total_menus=total_menus,
-                           count_per_role=count_per_role)
+                           count_per_role=count_per_role,
+                           sales_list=sales_list)
 
 @app.route('/kelolaMenu')
 @admin_required
@@ -1002,6 +1006,7 @@ def hapusAdmin(current_user, admin_id):
     users_collection.delete_one({'_id': ObjectId(admin_id)})
     flash('Admin berhasil dihapus', 'success')
     return redirect(url_for('kelolaAdmin'))
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=5000, debug=True)

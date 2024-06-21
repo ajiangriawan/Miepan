@@ -25,13 +25,13 @@ Checkout
                         <p>{{ item['namamenu'] }}</p>
                     </div>
                     <div class="col d-flex flex-wrap">
-                        <p>Rp. {{ item['hargamenu']|int }}</p>
+                        <p>{{ item['hargamenu']|int|rupiah }}</p>
                     </div>
                     <div class="col d-flex flex-wrap align-items-center">
                         <p>{{ item['quantity'] }}</p>
                     </div>
                     <div class="col d-flex flex-wrap">
-                        <p>Rp. {{ item['hargamenu']|int * item['quantity'] }}</p>
+                        <p>{{ (item['hargamenu']|int * item['quantity'])|rupiah }}</p>
                     </div>
                 </a>
             </div>
@@ -50,7 +50,7 @@ Checkout
                 <p>Nama Pemesan</p>
                 <h5>{{ user['nama'] }}</h5>
                 <p>Total Yang Harus Dibayarkan</p>
-                <h5>Rp. {{ total_amount }}</h5>
+                <h5>{{ total_amount|rupiah }}</h5>
                 <div class="container text-center mt-2 mb-2">
                     <button type="submit" class="btn btn-primary">Bayar Sekarang</button>
                 </div>

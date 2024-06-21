@@ -45,8 +45,53 @@
     </div>
   </div>
   <div class="container text-center mt-5">
-    <h2>Selamat Datang</h2>
-    <h4>Jangan Lupa Berdoa dan Selamat Bekerja</h4>
+    <!-- Selesai -->
+    {% if sales_list %} {% for order in sales_list %}
+    <div class="card mt-2" style="width: 100%">
+      <div class="row g-0 align-items-center justify-content-between">
+        <div class="col-md-2 d-flex flex-column justify-content-start">
+          <p><strong>Daftar Menu:</strong></p>
+          <ul>
+            {% for item in order['items'] %}
+            <li>{{ item['namamenu'] }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <div class="card-body">
+            <div class="container text-center">
+              <div
+                class="row align-items-center justify-content-between text-start"
+              >
+                <div class="col-md-3 d-flex justify-content-start">
+                  {{ order['order_number'] }}
+                </div>
+                <div class="col-md-3">
+                  {{ order['total_amount']|rupiah }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 d-flex justify-content-end">
+          <a
+            href="{{ url_for('detailPesanan', order_id=order._id) }}"
+            class="me-2 btn btn-primary"
+            >Detail</a
+          >
+          <a
+            href="{{ url_for('strukPesanan', order_id=order._id) }}"
+            class="me-2 btn btn-outline-primary"
+            >Struk</a
+          >
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <p class="text-center w-100" data-status="selesai">
+      Tidak ada pesanan yang telah selesai.
+    </p>
+    {% endif %}
     <br />
   </div>
 </div>
