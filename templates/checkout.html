@@ -1,61 +1,89 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Checkout
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %} Checkout {% endblock %} {% block
+content %}
 <div class="container text-center mt-3 mb-5">
-    <div class="container text-start">
-        <h3>Checkout</h3>
-        <br>
+  <div class="container text-start">
+    <h3>Checkout</h3>
+    <br />
+  </div>
+  <div
+    class="text-center border p-2 rounded d-flex flex-wrap flex-row gap-1 justify-content-center"
+    id="checkout-menu"
+    style="width: 100%"
+  >
+    <div
+      class="text-start mt-2 mb-2 d-flex flex-wrap grid gap-3"
+      id="checkout-menu"
+    >
+      {% for item in cart_items %}
+      <div class="card" style="width: 100%">
+        <a
+          href="/detail_menu/{{ item['_id'] }}"
+          class="g-0 align-items-center d-flex flex-wrap text-start"
+          id="card-keranjang"
+        >
+          <div class="col">
+            <img
+              src="{{ item['fotomenu'] }}"
+              class="img-fluid rounded-start"
+              alt="..."
+              style="max-width: 70px"
+            />
+          </div>
+          <div class="col d-flex flex-wrap">
+            <p>{{ item['namamenu'] }}</p>
+          </div>
+          <div class="col d-flex flex-wrap">
+            <p>{{ item['hargamenu']|int|rupiah }}</p>
+          </div>
+          <div class="col d-flex flex-wrap align-items-center">
+            <p>{{ item['quantity'] }}</p>
+          </div>
+          <div class="col d-flex flex-wrap">
+            <p>{{ (item['hargamenu']|int * item['quantity'])|rupiah }}</p>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
     </div>
-    <div class="text-center border p-2 rounded d-flex flex-wrap flex-row gap-1 justify-content-center"
-        id="checkout-menu" style="width: 100%;">
-        <div class="text-start mt-2 mb-2 d-flex flex-wrap grid gap-3" id="checkout-menu">
-            {% for item in cart_items %}
-            <div class="card" style="width: 100%;">
-                <a href="/detail_menu/{{ item['_id'] }}" class="g-0 align-items-center d-flex flex-wrap text-start"
-                    id="card-keranjang">
-                    <div class="col">
-                        <img src="{{ item['fotomenu'] }}" class="img-fluid rounded-start" alt="..."
-                            style="max-width: 70px;">
-                    </div>
-                    <div class="col d-flex flex-wrap">
-                        <p>{{ item['namamenu'] }}</p>
-                    </div>
-                    <div class="col d-flex flex-wrap">
-                        <p>{{ item['hargamenu']|int|rupiah }}</p>
-                    </div>
-                    <div class="col d-flex flex-wrap align-items-center">
-                        <p>{{ item['quantity'] }}</p>
-                    </div>
-                    <div class="col d-flex flex-wrap">
-                        <p>{{ (item['hargamenu']|int * item['quantity'])|rupiah }}</p>
-                    </div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
 
-        <div class="p-2 text-start mt-2 mb-2 d-flex flex-wrap grid gap-3 border" id="checkout-total">
-            <h3>Informasi Pemesanan</h3>
-            <form action="{{ url_for('checkout') }}" method="POST">
-                <select class="form-select" aria-label="Pilih Metode Pembayaran" name="metode_pembayaran">
-                    <option selected disabled>Pilih Pembayaran</option>
-                    <option value="bca">BCA</option>
-                    <option value="ovo">OVO</option>
-                    <option value="kasir">Kasir</option>
-                </select>
-                <p>Nama Pemesan</p>
-                <h5>{{ user['nama'] }}</h5>
-                <p>Total Yang Harus Dibayarkan</p>
-                <h5>{{ total_amount|rupiah }}</h5>
-                <div class="container text-center mt-2 mb-2">
-                    <button type="submit" class="btn btn-primary">Bayar Sekarang</button>
-                </div>
-            </form>
+    <div
+      class="p-2 text-start mt-2 mb-2 d-flex flex-wrap grid gap-3 border"
+      id="checkout-total"
+    >
+      <h3>Informasi Pemesanan</h3>
+      <form action="{{ url_for('checkout') }}" method="POST">
+        <select
+          class="form-select"
+          aria-label="Pilih Metode Pembayaran"
+          name="metode_pembayaran"
+          required
+        >
+          <option selected disabled>Pilih Pembayaran</option>
+          <option value="BCA - 1150661320">BCA - 1150661320</option>
+          <option value="OVO - 087813233775">OVO - 087813233775</option>
+          <option value="Kasir">Kasir</option>
+        </select>
+        <p>Nama Pemesan</p>
+        <h5>{{ user['nama'] }}</h5>
+        <p>Total Yang Harus Dibayarkan</p>
+        <h5>{{ total_amount|rupiah }}</h5>
+        <div class="container text-center mt-2 mb-2">
+          <button type="submit" class="btn btn-primary">Bayar Sekarang</button>
         </div>
+      </form>
     </div>
+  </div>
 </div>
+
 {% endblock %}
+<script>
+  document.querySelector("form").addEventListener("submit", function (event) {
+    var selectElement = document.querySelector(
+      'select[name="metode_pembayaran"]'
+    );
+    if (!selectElement.value || selectElement.value === "") {
+      event.preventDefault(); // Mencegah pengiriman formulir jika tidak ada opsi yang dipilih
+      alert("Pilih metode pembayaran terlebih dahulu.");
+    }
+  });
+</script>

@@ -1,5 +1,8 @@
-{% extends 'base.html' %} {% block title %} Nilai Pesanan {% endblock %} {%
-block content %}
+{% extends 'base.html' %} 
+{% block title %} 
+Nilai Pesanan 
+{% endblock %} 
+{% block content %}
 <div class="container text-center mt-3 mb-5">
   <div class="container text-start">
     <h3>Nilai Pesanan :</h3>
@@ -33,7 +36,7 @@ block content %}
                     <div class="col-md-1">{{ item.quantity }}</div>
                     <div class="col-md-3">Rp. {{ item.hargamenu }}</div>
                     <div class="col-md-2 d-flex justify-content-end">
-                      {% if item.review  %}
+                      {% if item.review %}
                       <button
                         type="button"
                         class="btn btn-warning"

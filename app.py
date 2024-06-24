@@ -335,7 +335,14 @@ def pesanan(current_user):
         else:
             reviews_dict[order_number] = [review]
 
-    return render_template("pesanan.html", user=current_user, user_role=user_role, belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi, proses=proses, selesai=selesai, reviews_dict=reviews_dict, review=review)
+    # Assuming you want to pass the first review in reviews_dict (adjust as per your logic)
+    review = None
+    if reviews_dict:
+        review = reviews_dict[next(iter(reviews_dict))][0]  # Get the first review from the first order in reviews_dict
+
+    return render_template("pesanan.html", user=current_user, user_role=user_role,
+                           belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi,
+                           proses=proses, selesai=selesai, reviews_dict=reviews_dict, review=review)
 
 @app.route("/bayar")
 @token_required
@@ -466,6 +473,12 @@ def checkout(current_user):
             return redirect(url_for('index'))
 
         total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
+        
+        payment_method = request.form.get('metode_pembayaran')
+        if not payment_method:
+            flash('Pilih metode pembayaran terlebih dahulu.', 'danger')
+            return redirect(url_for('checkout'))
+        
         order_number = generate_order_number(current_user['nama'])
         sales_data = {
             'user_id': current_user['_id'],
@@ -481,7 +494,7 @@ def checkout(current_user):
         sales_collection.insert_one(sales_data)
         carts_collection.delete_many({'user_id': current_user['_id']})
 
-        flash('Pembayaran berhasil, terima kasih telah berbelanja!', 'success')
+        flash('Pesanan berhasil dibuat, silahkan melakukan pembayaran!', 'success')
         return redirect(url_for('payment', order_number=order_number))
     else:
         cart_items = list(carts_collection.find({'user_id': current_user['_id']}))

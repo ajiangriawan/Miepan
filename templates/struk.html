@@ -66,11 +66,17 @@ user_role == 'pelanggan' %} {% extends 'base.html' %} {% endif %} {% block title
 <!-- Print Button -->
 <div class="container d-flex flex-wrap mt-2">
   {% if user_role == 'pelanggan' %}
-  <a style="width: 100%;" href="{{ url_for('pesanan') }}" class="btn btn-outline-primary"
+  <a
+    style="width: 100%"
+    href="{{ url_for('pesanan') }}"
+    class="btn btn-outline-primary"
     >Kembali</a
   >
   {% endif %} {% if user_role == 'admin' %}
-  <a style="width: 100%;" href="{{ url_for('kelolaPesanan') }}" class="btn btn-outline-primary"
+  <a
+    style="width: 100%"
+    href="{{ url_for('kelolaPesanan') }}"
+    class="btn btn-outline-primary"
     >Kembali</a
   >{% endif %}
   <button class="btn btn-primary btn-print" onclick="printReceipt()">

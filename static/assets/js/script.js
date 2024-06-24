@@ -105,9 +105,18 @@ function updateQuantity(itemId, action) {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        document.getElementById(`qty-${itemId}`).textContent = data.new_quantity;
-        const newTotalPrice = data.new_quantity * parseInt(document.querySelector(`#checkbox-${itemId}`).closest(".card").querySelector(".item-price").textContent);
-        document.getElementById(`total-price-${itemId}`).textContent = newTotalPrice.toLocaleString("id-ID");
+        document.getElementById(`qty-${itemId}`).textContent =
+          data.new_quantity;
+        const newTotalPrice =
+          data.new_quantity *
+          parseInt(
+            document
+              .querySelector(`#checkbox-${itemId}`)
+              .closest(".card")
+              .querySelector(".item-price").textContent
+          );
+        document.getElementById(`total-price-${itemId}`).textContent =
+          newTotalPrice.toLocaleString("id-ID");
         updateTotals();
       } else {
         alert(data.message);
@@ -123,7 +132,10 @@ function deleteItemFromCart(itemId) {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          document.getElementById(`checkbox-${itemId}`).closest(".card").remove();
+          document
+            .getElementById(`checkbox-${itemId}`)
+            .closest(".card")
+            .remove();
           updateTotals();
         } else {
           alert(data.message);
@@ -140,15 +152,23 @@ function updateTotals() {
   checkboxes.forEach((checkbox) => {
     if (checkbox.checked) {
       const itemId = checkbox.id.split("-")[1];
-      const quantity = parseInt(document.getElementById(`qty-${itemId}`).textContent);
-      const price = parseInt(document.querySelector(`#checkbox-${itemId}`).closest(".card").querySelector(".item-price").textContent);
+      const quantity = parseInt(
+        document.getElementById(`qty-${itemId}`).textContent
+      );
+      const price = parseInt(
+        document
+          .querySelector(`#checkbox-${itemId}`)
+          .closest(".card")
+          .querySelector(".item-price").textContent
+      );
       totalItems += quantity;
       totalAmount += price * quantity;
     }
   });
 
   document.getElementById("total-items").textContent = totalItems;
-  document.getElementById("total-amount").textContent = "Rp. " + totalAmount.toLocaleString("id-ID") + ",-";
+  document.getElementById("total-amount").textContent =
+    "Rp. " + totalAmount.toLocaleString("id-ID") + ",-";
 }
 
 document.addEventListener("DOMContentLoaded", function () {

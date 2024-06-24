@@ -1,124 +1,125 @@
 {% extends 'base.html' %} {% block title %} Keranjang {% endblock %} {% block
-content %}
-
-<!-- ======= Main Content ======= -->
-<div class="container text-center mt-3 mb-5">
-  <div class="container text-start">
-    <h3>Keranjang</h3>
-    <br />
-  </div>
-  <div class="text-center border p-2 rounded">
-    <div
-      class="text-start mt-2 mb-2 d-flex flex-wrap grid gap-3"
-      id="container-card"
-    >
-      {% if cart_items %} {% for item in cart_items %}
-      <div class="card" style="width: 100%">
-        <div
-          class="g-0 align-items-center d-flex flex-wrap text-start"
-          id="card-keranjang"
-        >
-          <div class="col-4 d-flex flex-row flex-wrap">
-            <div class="me-4 d-flex form-check align-items-center">
+  content %}
+  
+  <!-- ======= Main Content ======= -->
+  <div class="container text-center mt-3 mb-5">
+    <div class="container text-start">
+      <h3>Keranjang</h3>
+      <br />
+    </div>
+    <div class="text-center border p-2 rounded">
+      <div
+        class="text-start mt-2 mb-2 d-flex flex-wrap grid gap-3"
+        id="container-card"
+      >
+        {% if cart_items %} {% for item in cart_items %}
+        <div class="card" style="width: 100%">
+          <div
+            class="g-0 align-items-center d-flex flex-wrap text-start"
+            id="card-keranjang"
+          >
+            <div class="col-4 d-flex flex-row flex-wrap">
+              <div class="me-4 d-flex form-check align-items-center">
+                <input
+                  class="form-check-input item-checkbox"
+                  type="checkbox"
+                  value=""
+                  id="checkbox-{{ item['_id'] }}"
+                  hidden
+                />
+              </div>
+              <div>
+                <a href="/detail_menu/{{ item['menu_id'] }}">
+                  <img
+                    src="{{ item['fotomenu'] }}"
+                    alt="{{ item['namamenu'] }}"
+                    class="img-fluid rounded-start me-2"
+                    style="max-width: 50px"
+                  />
+                  {{ item['namamenu'] }}
+                </a>
+              </div>
+            </div>
+            <span hidden class="item-price">{{ item['hargamenu'] }}</span>
+            <div class="col me-4 d-flex flex-wrap g-2">
+              <button
+                class="btn btn-outline-danger btn-sm"
+                onclick="event.stopPropagation(); updateQuantity('{{ item['_id'] }}', 'decrease')"
+              >
+                -
+              </button>
+              <span class="m-2" id="qty-{{ item['_id'] }}" name="qty"
+                >{{ item['quantity'] }}</span
+              >
+              <button
+                class="btn btn-outline-danger btn-sm"
+                onclick="event.stopPropagation(); updateQuantity('{{ item['_id'] }}', 'increase')"
+              >
+                +
+              </button>
+            </div>
+            <div class="col me-4 d-flex flex-wrap">
+              Rp.
+              <span class="total-price" id="total-price-{{ item['_id'] }}"
+                >{{ item['hargamenu'] * item['quantity'] }}</span
+              >,-
+            </div>
+            <div class="col d-flex flex-wrap text-end justify-content-end">
+              <a
+                href="/detail_menu/{{ item['menu_id'] }}"
+                class="btn btn-primary me-2"
+                >Detail</a
+              >
+              <button
+                class="btn btn-outline-primary material-symbols-outlined"
+                onclick="deleteItemFromCart('{{ item['_id'] }}')"
+              >
+                delete
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p>Keranjang Anda kosong.</p>
+        {% endif %}
+      </div>
+    </div>
+  
+    <div class="text-center border p-2 rounded mt-2">
+      <div
+        class="text-start mt-2 d-flex flex-wrap flex-row grid gap-3 align-items-center"
+        id="container-card"
+      >
+        <div class="row" style="width: 100%">
+          <div class="col-4">
+            <div class="form-check">
               <input
-                class="form-check-input item-checkbox"
+                class="form-check-input"
                 type="checkbox"
                 value=""
-                id="checkbox-{{ item['_id'] }}"
+                id="select-all"
+                checked
                 hidden
               />
-            </div>
-            <div>
-              <a href="/detail_menu/{{ item['menu_id'] }}">
-                <img
-                  src="{{ item['fotomenu'] }}"
-                  alt="{{ item['namamenu'] }}"
-                  class="img-fluid rounded-start me-2"
-                  style="max-width: 50px"
-                />
-                {{ item['namamenu'] }}
-              </a>
+              <label class="form-check-label" for="select-all" hidden>Pilih Semua</label>
             </div>
           </div>
-          <span hidden class="item-price">{{ item['hargamenu'] }}</span>
-          <div class="col me-4 d-flex flex-wrap g-2">
-            <button
-              class="btn btn-outline-danger btn-sm"
-              onclick="event.stopPropagation(); updateQuantity('{{ item['_id'] }}', 'decrease')"
-            >
-              -
-            </button>
-            <span class="m-2" id="qty-{{ item['_id'] }}" name="qty"
-              >{{ item['quantity'] }}</span
-            >
-            <button
-              class="btn btn-outline-danger btn-sm"
-              onclick="event.stopPropagation(); updateQuantity('{{ item['_id'] }}', 'increase')"
-            >
-              +
-            </button>
-          </div>
-          <div class="col me-4 d-flex flex-wrap">
-            Rp.
-            <span class="total-price" id="total-price-{{ item['_id'] }}"
-              >{{ item['hargamenu'] * item['quantity'] }}</span
-            >,-
-          </div>
-          <div class="col d-flex flex-wrap text-end justify-content-end">
-            <a
-              href="/detail_menu/{{ item['menu_id'] }}"
-              class="btn btn-primary me-2"
-              >Detail</a
-            >
-            <button
-              class="btn btn-outline-primary material-symbols-outlined"
-              onclick="deleteItemFromCart('{{ item['_id'] }}')"
-            >
-              delete
-            </button>
-          </div>
-        </div>
-      </div>
-      {% endfor %} {% else %}
-      <p>Keranjang Anda kosong.</p>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="text-center border p-2 rounded mt-2">
-    <div
-      class="text-start mt-2 d-flex flex-wrap flex-row grid gap-3 align-items-center"
-      id="container-card"
-    >
-      <div class="row" style="width: 100%">
-        <div class="col-4">
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              value=""
-              id="select-all"
-              checked
-              hidden
-            />
-            <label class="form-check-label" for="select-all" hidden>Pilih Semua</label>
-          </div>
-        </div>
-        <div
-          class="col-8 d-flex flex-wrap justify-content-between align-items-center"
-        >
-          <h5>Total Produk:</h5>
-          <h5 id="total-items">0</h5>
-          <h5>Total Bayar:</h5>
-          <h5 id="total-amount">Rp. 0,-</h5>
-          <a href="{{ url_for('checkout') }}" class="btn btn-primary"
-            >Beli Sekarang</a
+          <div
+            class="col-8 d-flex flex-wrap justify-content-between align-items-center"
           >
+            <h5>Total Produk:</h5>
+            <h5 id="total-items">0</h5>
+            <h5>Total Bayar:</h5>
+            <h5 id="total-amount">Rp. 0,-</h5>
+            <a href="{{ url_for('checkout') }}" class="btn btn-primary"
+              >Beli Sekarang</a
+            >
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<!-- ======= End of Main Content ======= -->
-
-{% endblock %}
+  <!-- ======= End of Main Content ======= -->
+  
+  {% endblock %}
+  

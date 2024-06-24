@@ -1,5 +1,8 @@
-{% extends 'base.html' %} {% block title %} Pesanan {% endblock %} {% block
-content%}
+{% extends 'base.html' %}
+{% block title %} 
+Pesanan 
+{% endblock %}
+{% block content%}
 
 <!-- ======= Main Content ======= -->
 <div class="container text-center mt-3 mb-5">
@@ -196,6 +199,11 @@ content%}
                         href="{{ url_for('strukPesanan', order_id=order._id) }}"
                         class="me-2 btn btn-outline-primary"
                         >Struk</a
+                      >
+                      <a
+                        href="{{ url_for('nilaiPesanan', order_id=order._id) }}"
+                        class="me-2 btn btn-outline-secondary"
+                        >Nilai</a
                       >
                     </div>
                   </div>
