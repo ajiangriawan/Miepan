@@ -1,47 +1,88 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block title %} Pembayaran {% endblock %} {% block
+content %}
+<div
+  class="container d-flex flex-column text-center mt-3 mb-5 align-items-center justify-content-center"
+>
+  <div class="container text-center">
+    <h3>Pembayaran</h3>
+    <br />
+  </div>
+  <div class="card border p-2" style="width: 80%">
+    <div class="row g-0 align-items-center justify-content-center">
+      <div class="col-md-4">
+        <img
+          src="{{ url_for('static', filename='assets/img/logo-miepan.png') }}"
+          class="img-fluid rounded-start"
+          alt="barcode"
+        />
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <div class="container text-center">
+            <div
+              class="row align-items-center justify-content-center text-start"
+            >
+              <h5>Metode Pembayaran:</h5>
+              <h2>{{ order['payment_method'] }}</h2>
+              <h5>No Pesanan:</h5>
+              <h2>{{ order['order_number'] }}</h2>
+              <h5>Nama Pemesan:</h5>
+              <h2>{{ order['user_name'] }}</h2>
+              <h5>Total :</h5>
+              <h2>{{ order['total_amount']|rupiah }}</h2>
 
-{% block title %}
-Pembayaran
-{% endblock %}
-
-{% block content %}
-
-<div class="container d-flex flex-column text-center mt-3 mb-5 align-items-center justify-content-center">
-    <div class="container text-center">
-        <h3>Pembayaran</h3>
-        <br>
-    </div>
-    <div class="card border p-2" style="width: 80%;">
-        <div class="row g-0 align-items-center justify-content-center">
-            <div class="col-md-4">
-                <img src="{{ url_for('static', filename='assets/img/logo-miepan.png') }}" class="img-fluid rounded-start"
-                    alt="barcode">
+              <!-- Tombol Bayar -->
+              <button
+                id="pay-button"
+                class="btn btn-primary mt-3"
+                data-snap-token="{{ snap_token }}"
+              >
+                Bayar Sekarang
+              </button>
+              <div id="payment-status" class="mt-3"></div>
             </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <div class="container text-center">
-                        <div class="row align-items-center justify-content-center text-start">
-                            <h5>Metode Pembayaran:</h5>
-                            <h2>{{ order['payment_method'] }}</h2>
-                            <h5>No Pesanan:</h5>
-                            <h2>{{ order['order_number'] }}</h2>
-                            <h5>Nama Pemesan:</h5>
-                            <h2>{{ order['user_name'] }}</h2>
-                            <h5>Total :</h5>
-                            <h2>Rp. {{ order['total_amount'] }}</h2>
-                            <form method="post"
-                                action="{{ url_for('upload_bukti_pembayaran', order_number=order['order_number']) }}"
-                                enctype="multipart/form-data">
-                                <input type="file" class="form-control mb-2 mt-2" id="inputGroupFile04" name="bukti"
-                                    required>
-                                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Kirim</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
+<!-- SCRIPT MIDTRANS WAJIB -->
+<script
+  src="https://app.sandbox.midtrans.com/snap/snap.js"
+  data-client-key="SB-Mid-client-dSgDuAoxFydvJJbN"
+></script>
+
+<script type="text/javascript">
+  document.getElementById("pay-button").addEventListener("click", function (e) {
+    e.preventDefault();
+    var snapToken = this.getAttribute("data-snap-token");
+    var paymentStatus = document.getElementById("payment-status");
+
+    if (snapToken) {
+      snap.pay(snapToken, {
+        onSuccess: function (result) {
+          console.log("success", result);
+          window.location.href = `/finish?transaction_status=${result.transaction_status}&order_id=${result.order_id}`;
+        },
+        onPending: function (result) {
+          console.log("pending", result);
+          window.location.href = `/finish?transaction_status=${result.transaction_status}&order_id=${result.order_id}`;
+        },
+        onError: function (result) {
+          console.log("error", result);
+          document.getElementById("payment-status").innerHTML =
+            '<div class="alert alert-danger">Pembayaran gagal!</div>';
+        },
+        onClose: function () {
+          console.log("Popup ditutup tanpa menyelesaikan pembayaran");
+        },
+      });
+    } else {
+      paymentStatus.innerHTML =
+        '<div class="alert alert-danger">Snap Token tidak ditemukan!</div>';
+    }
+  });
+</script>
 {% endblock %}

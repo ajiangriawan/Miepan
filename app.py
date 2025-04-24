@@ -18,12 +18,32 @@ from datetime import datetime
 from flask import jsonify, request
 import random
 
+from flask import Flask, render_template, request, jsonify
+import midtransclient
+from datetime import datetime
+
+import logging
+
+
+# Konfigurasi logging
+logging.basicConfig(level=logging.INFO,  # Atau logging.DEBUG untuk detail lebih
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 # Load environment variables
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
+
+# Konfigurasi Midtrans
+snap = midtransclient.Snap(
+    is_production=False,
+    server_key='SB-Mid-server-JXRpAuUv6DPPtc_J6EI1j2K5',
+    client_key='SB-Mid-client-dSgDuAoxFydvJJbN'
+)
+
 
 # Directories for image uploads
 UPLOAD_FOLDER = 'static/img/profil'
@@ -118,6 +138,8 @@ def format_rupiah(value):
         return "Rp 0"  # atau nilai default yang sesuai jika tidak bisa dikonversi
 
 app.jinja_env.filters['rupiah'] = format_rupiah
+
+
 
 @app.route('/')
 def index():
@@ -474,10 +496,11 @@ def checkout(current_user):
 
         total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
         
-        payment_method = request.form.get('metode_pembayaran')
-        if not payment_method:
-            flash('Pilih metode pembayaran terlebih dahulu.', 'danger')
-            return redirect(url_for('checkout'))
+        payment_method = 'midtrans'
+        #payment_method = request.form.get('metode_pembayaran')
+        #if not payment_method:
+         #   flash('Pilih metode pembayaran terlebih dahulu.', 'danger')
+          #  return redirect(url_for('checkout'))
         
         order_number = generate_order_number(current_user['nama'])
         sales_data = {
@@ -505,15 +528,107 @@ def checkout(current_user):
         total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
         return render_template("checkout.html", user=current_user, user_role=user_role, cart_items=cart_items, total_amount=total_amount)
 
+logging.basicConfig(level=logging.INFO,  # Atau logging.DEBUG untuk detail lebih
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 @app.route('/payment/<order_number>', methods=['GET'])
 @token_required
 def payment(current_user, order_number):
-    order = sales_collection.find_one({'order_number': order_number, 'user_id': current_user['_id']})
-    if order:
-        return render_template('pembayaran.html', order=order, user=current_user)
-    else:
-        flash('Order not found.', 'danger')
+    try:
+        logging.info(f"Memproses pembayaran untuk Order Number: {order_number}")
+        order = sales_collection.find_one({'order_number': order_number, 'user_id': current_user['_id']})
+
+        if not order:
+            logging.warning(f"Order dengan nomor {order_number} tidak ditemukan.")
+            flash('Order tidak ditemukan.', 'danger')
+            return redirect(url_for('pesanan'))  # Atau halaman lain yang sesuai
+
+        # Validasi data order
+        if not isinstance(order['total_amount'], (int, float)):
+            logging.error(f"Total amount tidak valid: {order['total_amount']}")
+            flash('Invalid order amount.', 'danger')
+            return redirect(url_for('index'))
+
+        transaction = {
+            'transaction_details': {
+                'order_id': order['order_number'],
+                'gross_amount': int(order['total_amount']),  # Pastikan integer
+            },
+            'customer_details': {
+                'first_name': current_user.get('nama', ''),  # Gunakan 'nama' dari user
+                'email': current_user.get('email', '')
+            }
+        }
+
+        logging.info(f"Data transaksi Midtrans: {transaction}")
+
+        snap_response = snap.create_transaction(transaction)
+        logging.info(f"Respons dari Midtrans: {snap_response}")
+
+        if snap_response.get('token'):  # Periksa keberadaan token
+            snap_token = snap_response['token']
+            logging.info(f"Snap Token yang dibuat: {snap_token}")
+            return render_template('pembayaran.html', order=order, user=current_user, snap_token=snap_token)
+        else:
+            logging.error(f"Gagal mendapatkan token dari Midtrans: {snap_response}")
+            flash('Gagal membuat token pembayaran. Silakan coba lagi.', 'danger')
+            return redirect(url_for('pesanan'))
+
+    except midtransclient.MidtransAPIError as e:  # Tangkap exception Midtrans
+        logging.error(f"Error Midtrans: {e.raw_json}")
+        flash(f'Terjadi kesalahan saat memproses pembayaran: {e.raw_json}', 'danger')
+        return redirect(url_for('pesanan'))
+
+    except Exception as e:
+        logging.exception(f"Error saat memproses pembayaran untuk Order Number {order_number}: {e}")
+        flash(f'Terjadi kesalahan saat memproses pembayaran: {e}', 'danger')
+        return redirect(url_for('pesanan'))
+
+
+@app.route('/finish')  # Contoh route finish
+def finish_payment():
+    logging.info("Masuk ke route /finish")
+    logging.info(f"Data dari Midtrans: {request.args}")  # Log data GET
+    transaction_status = request.args.get('transaction_status')
+    order_id = request.args.get('order_id')
+    try:
+        logging.info(f"Memproses status transaksi: {transaction_status} untuk Order ID: {order_id}")
+        order = sales_collection.find_one({'order_number': order_id})
+        if not order:
+            logging.warning(f"Order dengan nomor {order_id} tidak ditemukan di database.")
+            flash('Order tidak ditemukan.', 'danger')
+            return redirect(url_for('pesanan'))  # Atau halaman yang sesuai
+
+        if transaction_status == 'capture' or transaction_status == 'settlement':
+            # Pembayaran berhasil
+            sales_collection.update_one(
+                {'order_number': order_id},
+                {'$set': {'status': 'menunggu konfirmasi'}}  # Atau 'dibayar', sesuaikan dengan alur Anda
+            )
+            logging.info(f"Status order {order_id} diperbarui menjadi 'menunggu konfirmasi'")
+            flash('Pembayaran berhasil. Menunggu konfirmasi dari penjual.', 'success')
+        elif transaction_status == 'pending':
+            logging.info(f"Pembayaran untuk order {order_id} masih pending.")
+            flash('Pembayaran pending. Menunggu konfirmasi dari bank.', 'warning')
+        elif transaction_status == 'deny' or transaction_status == 'expire' or transaction_status == 'cancel':
+            # Pembayaran gagal
+            sales_collection.update_one(
+                {'order_number': order_id},
+                {'$set': {'status': 'gagal'}}
+            )
+            logging.warning(f"Pembayaran untuk order {order_id} gagal.")
+            flash('Pembayaran gagal.', 'danger')
+        else:
+            logging.warning(f"Status transaksi tidak dikenal: {transaction_status}")
+            flash(f'Status transaksi tidak dikenal: {transaction_status}', 'warning')
+
+        return redirect(url_for('pesanan'))  # Redirect ke halaman pesanan atau halaman detail order
+
+    except Exception as e:
+        logging.error(f"Error dalam /finish: {e}", exc_info=True)
+        flash(f'Terjadi kesalahan saat memproses pembayaran: {e}', 'danger')
         return redirect(url_for('index'))
+
 
 @app.route('/upload_bukti_pembayaran/<order_number>', methods=['POST'])
 @token_required

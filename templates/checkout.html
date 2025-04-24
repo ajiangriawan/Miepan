@@ -52,17 +52,7 @@ content %}
     >
       <h3>Informasi Pemesanan</h3>
       <form action="{{ url_for('checkout') }}" method="POST">
-        <select
-          class="form-select"
-          aria-label="Pilih Metode Pembayaran"
-          name="metode_pembayaran"
-          required
-        >
-          <option selected disabled>Pilih Pembayaran</option>
-          <option value="BCA - 1150661320">BCA - 1150661320</option>
-          <option value="OVO - 087813233775">OVO - 087813233775</option>
-          <option value="Kasir">Kasir</option>
-        </select>
+        <input type="hidden" name="metode_pembayaran" value="midtrans">
         <p>Nama Pemesan</p>
         <h5>{{ user['nama'] }}</h5>
         <p>Total Yang Harus Dibayarkan</p>

@@ -1,0 +1,59 @@
+
+{% extends 'base.html' %}
+{% block title %}Identitas Pengunjung{% endblock %}
+{% block content %}
+
+<section class="h-100 gradient-form" style="background-color: #eee">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-xl-10">
+        <div class="card rounded-3 text-black">
+          <div class="row g-0">
+            <div class="col-lg-6">
+              <div class="card-body p-md-5 mx-md-4">
+                <div class="text-center">
+                  <img src="../static/assets/img/logo-miepan.png" style="width: 100px" alt="logo"/>
+                  <h4 class="mt-1 mb-3 pb-1">Isi Identitas Anda</h4>
+                </div>
+                {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %} {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                  {{ message }}
+                </div>
+                {% endfor %} {% endif %} {% endwith %}
+
+                <form method="POST" action="/identitas">
+                  <div class="form-group mb-3">
+                    <label for="nama">Nama:</label>
+                    <input type="text" name="nama" class="form-control" required />
+                  </div>
+
+                  <div class="form-group mb-3">
+                    <label for="notlp">No Telepon:</label>
+                    <input type="tel" name="notlp" class="form-control" required />
+                  </div>
+
+                  <div class="form-group mb-3">
+                    <label for="meja">Nomor Meja:</label>
+                    <input type="text" name="meja" class="form-control" required />
+                  </div>
+
+                  <button type="submit" class="btn btn-primary w-100">Lanjut</button>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-center justify-content-center bg-black">
+              <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                <img src="../static/assets/img/login.png" alt="login" id="img-content" class="img-fluid" />
+                <h4 class="mb-4">Selamat datang di layanan self-order!</h4>
+                <p class="small mb-0">Silakan isi data untuk memulai pemesanan.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
