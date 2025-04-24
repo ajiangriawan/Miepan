@@ -55,6 +55,8 @@ content %}
         <input type="hidden" name="metode_pembayaran" value="midtrans">
         <p>Nama Pemesan</p>
         <h5>{{ user['nama'] }}</h5>
+        <p>Nomor Meja</p>
+        <h5>{{ user['meja'] }}</h5>
         <p>Total Yang Harus Dibayarkan</p>
         <h5>{{ total_amount|rupiah }}</h5>
         <div class="container text-center mt-2 mb-2">

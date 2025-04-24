@@ -15,13 +15,14 @@
                   <img src="../static/assets/img/logo-miepan.png" style="width: 100px" alt="logo"/>
                   <h4 class="mt-1 mb-3 pb-1">Isi Identitas Anda</h4>
                 </div>
+                <!--
                 {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %} {% for category, message in messages %}
                 <div class="alert alert-{{ category }}" role="alert">
                   {{ message }}
                 </div>
                 {% endfor %} {% endif %} {% endwith %}
-
+-->
                 <form method="POST" action="/identitas">
                   <div class="form-group mb-3">
                     <label for="nama">Nama:</label>

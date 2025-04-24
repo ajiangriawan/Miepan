@@ -62,41 +62,21 @@
         </a>
 
         <ul class="nav nav-pills">
-          {% if user_role == 'admin' %}
           <li class="nav-item">
             <a href="/dashboard" class="nav-link">Dashboard</a>
           </li>
-          {% endif %}
           <li class="nav-item">
-            <a href="/" class="nav-link" aria-current="page">Beranda</a>
-          </li>
-          <li class="nav-item"><a href="/menu" class="nav-link">Menu</a></li>
-          <li class="nav-item">
-            <a href="/tentang" class="nav-link">Tentang</a>
+            <a href="/kelolaMenu" class="nav-link">Menu</a>
           </li>
           <li class="nav-item">
-            <a href="/pesanan" class="nav-link" data-status="belum-dibayar"
-              >Pesanan</a
-            >
+            <a href="/kelolaPesanan" class="nav-link">Pesanan</a>
           </li>
-          <li class="nav-item position-relative">
-            <a href="/keranjang" class="nav-link">
-              <span class="material-symbols-outlined"> shopping_cart </span>
-            </a>
-
-            <span
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-              id="total_cart"
-            >
-              {{total_items}}
-              <span class="visually-hidden">new alerts</span>
-            </span>
+          <li class="nav-item">
+            <a href="/kelolaAdmin" class="nav-link">Admin</a>
           </li>
-          <!--
-          <li class="ms-5 nav-item">
-            <a href="/profil" class="btn btn-primary"> Akun </a>
+          <li class="nav-item">
+            <a href="/profil" class="btn btn-primary"> Profil </a>
           </li>
-          -->
         </ul>
       </div>
     </header>

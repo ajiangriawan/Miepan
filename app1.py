@@ -75,6 +75,15 @@ carts_collection = db.carts
 reviews_collection = db.reviews
 
 
+def guest_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'guest_info' not in session:
+            flash('Silakan isi identitas terlebih dahulu.')
+            return redirect(url_for('identitas'))
+        return f(*args, **kwargs)
+    return decorated
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -139,20 +148,6 @@ def format_rupiah(value):
 
 app.jinja_env.filters['rupiah'] = format_rupiah
 
-
-def guest_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if 'guest_info' not in session:
-            flash('Silakan isi identitas terlebih dahulu.')
-            return redirect(url_for('identitas'))
-        return f(*args, **kwargs)
-    return decorated
-
-def get_guest_id():
-    guest = session.get('guest_info', {})
-    return guest.get('nama') + "-" + guest.get('meja')
-
 @app.route('/identitas', methods=['GET', 'POST'])
 def identitas():
     if request.method == 'POST':
@@ -167,300 +162,6 @@ def identitas():
         }
         return redirect(url_for('menu'))
     return render_template('identitas.html')
-
-@app.route('/keranjang')
-@guest_required
-def keranjang():
-    guest = session['guest_info']
-    user_role = 'guest'
-    guest_id = get_guest_id()
-    carts = carts_collection.find({'user_id': guest_id}).sort('created_at', DESCENDING)
-    cart_items = list(carts)
-
-    for item in cart_items:
-        item['hargamenu'] = int(item['hargamenu'])
-        item['quantity'] = int(item['quantity'])
-        item['checked'] = True
-    return render_template("keranjang.html", user=guest, user_role=user_role, cart_items=cart_items)
-
-@app.route('/keranjang/<menu_id>', methods=['POST'])
-@guest_required
-def add_to_cart(menu_id):
-    user_role = 'guest'
-    guest = session['guest_info']
-    guest_id = get_guest_id()
-    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
-
-    if menu:
-        existing_cart_item = carts_collection.find_one({
-            'user_id': guest_id,
-            'menu_id': menu['_id']
-        })
-
-        if existing_cart_item:
-            new_quantity = existing_cart_item['quantity'] + 1
-            carts_collection.update_one(
-                {'_id': existing_cart_item['_id']},
-                {'$set': {'quantity': new_quantity}}
-            )
-            flash('Jumlah item di keranjang diperbarui', 'success')
-        else:
-            quantity = request.form.get('quantity', default=1, type=int)
-            cart_item = {
-                'user_id': guest_id,
-                'menu_id': menu['_id'],
-                'quantity': quantity,
-                'namamenu': menu['namamenu'],
-                'hargamenu': menu['hargamenu'],
-                'fotomenu': menu['fotomenu'],
-                'created_at': datetime.now(),
-            }
-            carts_collection.insert_one(cart_item)
-            flash('Menu ditambahkan ke keranjang', 'success')
-    else:
-        flash('Menu tidak ditemukan', 'danger')
-
-    return redirect(url_for('menu'))
-
-@app.route('/update_quantity/<item_id>', methods=['POST'])
-@guest_required
-def update_quantity(item_id):
-    guest_id = get_guest_id()
-    data = request.get_json()
-    action = data.get('action')
-    item = carts_collection.find_one({'_id': ObjectId(item_id), 'user_id': guest_id})
-
-    if item:
-        if action == 'increase':
-            new_quantity = item['quantity'] + 1
-        elif action == 'decrease' and item['quantity'] > 1:
-            new_quantity = item['quantity'] - 1
-        else:
-            return jsonify({'success': False, 'message': 'Invalid action or quantity cannot be less than 1'})
-
-        carts_collection.update_one({'_id': ObjectId(item_id)}, {'$set': {'quantity': new_quantity}})
-        return jsonify({'success': True, 'new_quantity': new_quantity})
-    else:
-        return jsonify({'success': False, 'message': 'Item not found in cart'})
-
-@app.route('/delete_item/<item_id>', methods=['DELETE'])
-@guest_required
-def delete_item(item_id):
-    guest_id = get_guest_id()
-    result = carts_collection.delete_one({'_id': ObjectId(item_id), 'user_id': guest_id})
-    if result.deleted_count == 1:
-        return jsonify({'success': True, 'message': 'Item berhasil dihapus'}), 200
-    else:
-        return jsonify({'success': False, 'message': 'Item tidak ditemukan'}), 404
-
-@app.route('/cart_count', methods=['GET'])
-@guest_required
-def cart_count():
-    guest_id = get_guest_id()
-    total_items = carts_collection.count_documents({'user_id': guest_id})
-    return jsonify({'total_items': total_items})
-
-@app.route('/checkout/<menu_id>', methods=['POST'])
-@guest_required
-def direct_checkout(menu_id):
-    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
-    if menu:
-        return redirect(url_for('checkout', menu_id=menu_id))
-    else:
-        flash('Menu tidak ditemukan', 'danger')
-        return redirect(url_for('menu'))
-
-def validate_cart_items(cart_items):
-    for item in cart_items:
-        try:
-            item['hargamenu'] = float(item['hargamenu'])
-            item['quantity'] = int(item['quantity'])
-        except ValueError:
-            return False
-    return True
-
-@app.route("/checkout", methods=['GET', 'POST'])
-@guest_required
-def checkout():
-    guest = session.get('guest_info')
-    guest_id = guest.get('nama') + "-" + guest.get('meja')  # digunakan sebagai user_id di carts
-    user_role = 'guest'
-
-    if request.method == 'POST':
-        cart_items = list(carts_collection.find({'user_id': guest_id}))
-        if not validate_cart_items(cart_items):
-            flash('Invalid data in cart items.', 'danger')
-            return redirect(url_for('menu'))
-
-        total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
-        order_number = generate_order_number(guest['nama'])
-
-        sales_data = {
-            'guest_nama': guest['nama'],
-            'guest_notlp': guest['notlp'],
-            'meja': guest['meja'],
-            'user_id': guest_id,
-            'user_name': guest['nama'],
-            'order_number': order_number,
-            'order_date': datetime.now(),
-            'items': cart_items,
-            'total_amount': total_amount,
-            'payment_method': 'midtrans',
-            'status': 'belum dibayar'
-        }
-
-        sales_collection.insert_one(sales_data)
-        carts_collection.delete_many({'user_id': guest_id})
-
-        flash('Pesanan berhasil dibuat, silakan lakukan pembayaran!', 'success')
-        return redirect(url_for('payment', order_number=order_number))
-
-    else:
-        cart_items = list(carts_collection.find({'user_id': guest_id}))
-        if not validate_cart_items(cart_items):
-            flash('Invalid data in cart items.', 'danger')
-            return redirect(url_for('menu'))
-
-        total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
-        return render_template("checkout.html", user=guest, user_role=user_role, cart_items=cart_items, total_amount=total_amount)
-
-@app.route("/bayar")
-@guest_required
-def bayar():
-    user = session.get('guest_info')
-    user_role = 'guest'
-    return render_template("pembayaran.html", user=user, user_role=user_role)
-
-@app.route('/payment/<order_number>', methods=['GET'])
-@guest_required
-def payment(order_number):
-    guest = session.get('guest_info')
-    guest_id = guest.get('nama') + "-" + guest.get('meja')
-
-    try:
-        logging.info(f"Memproses pembayaran untuk Order Number: {order_number}")
-        order = sales_collection.find_one({'order_number': order_number, 'user_id': guest_id})
-
-        if not order:
-            logging.warning(f"Order dengan nomor {order_number} tidak ditemukan.")
-            flash('Order tidak ditemukan.', 'danger')
-            return redirect(url_for('pesanan'))
-
-        if not isinstance(order['total_amount'], (int, float)):
-            logging.error(f"Total amount tidak valid: {order['total_amount']}")
-            flash('Invalid order amount.', 'danger')
-            return redirect(url_for('index'))
-
-        transaction = {
-            'transaction_details': {
-                'order_id': order['order_number'],
-                'gross_amount': int(order['total_amount']),
-            },
-            'customer_details': {
-                'first_name': guest.get('nama', ''),
-                'no_hp': guest.get('notlp', '')  # Bisa diisi no HP sebagai pengganti email
-            }
-        }
-
-        logging.info(f"Data transaksi Midtrans: {transaction}")
-        snap_response = snap.create_transaction(transaction)
-        logging.info(f"Respons dari Midtrans: {snap_response}")
-
-        if snap_response.get('token'):
-            snap_token = snap_response['token']
-            logging.info(f"Snap Token yang dibuat: {snap_token}")
-            return render_template('pembayaran.html', order=order, user=guest, snap_token=snap_token)
-        else:
-            logging.error(f"Gagal mendapatkan token dari Midtrans: {snap_response}")
-            flash('Gagal membuat token pembayaran. Silakan coba lagi.', 'danger')
-            return redirect(url_for('pesanan'))
-
-    except midtransclient.MidtransAPIError as e:
-        logging.error(f"Error Midtrans: {e}") 
-        flash(f'Terjadi kesalahan saat memproses pembayaran: {str(e)}', 'danger')
-        return redirect(url_for('pesanan'))
-
-
-    except Exception as e:
-        logging.exception(f"Error saat memproses pembayaran untuk Order Number {order_number}: {e}")
-        flash(f'Terjadi kesalahan saat memproses pembayaran: {e}', 'danger')
-        return redirect(url_for('pesanan'))
-
-@app.route('/finish')
-def finish_payment():
-    logging.info("Masuk ke route /finish")
-    logging.info(f"Data dari Midtrans: {request.args}")
-    transaction_status = request.args.get('transaction_status')
-    order_id = request.args.get('order_id')
-    try:
-        logging.info(f"Memproses status transaksi: {transaction_status} untuk Order ID: {order_id}")
-        order = sales_collection.find_one({'order_number': order_id})
-        if not order:
-            logging.warning(f"Order dengan nomor {order_id} tidak ditemukan di database.")
-            flash('Order tidak ditemukan.', 'danger')
-            return redirect(url_for('pesanan'))
-
-        if transaction_status == 'capture' or transaction_status == 'settlement':
-            sales_collection.update_one(
-                {'order_number': order_id},
-                {'$set': {'status': 'menunggu konfirmasi'}}
-            )
-            flash('Pembayaran berhasil. Menunggu konfirmasi dari penjual.', 'success')
-        elif transaction_status == 'pending':
-            flash('Pembayaran pending. Menunggu konfirmasi dari bank.', 'warning')
-        elif transaction_status in ['deny', 'expire', 'cancel']:
-            sales_collection.update_one(
-                {'order_number': order_id},
-                {'$set': {'status': 'gagal'}}
-            )
-            flash('Pembayaran gagal.', 'danger')
-        else:
-            flash(f'Status transaksi tidak dikenal: {transaction_status}', 'warning')
-
-        return redirect(url_for('pesanan'))
-
-    except Exception as e:
-        logging.error(f"Error dalam /finish: {e}", exc_info=True)
-        flash(f'Terjadi kesalahan saat memproses pembayaran: {e}', 'danger')
-        return redirect(url_for('index'))
-
-@app.route("/pesanan")
-@guest_required
-def pesanan():
-    guest = session.get('guest_info')
-    user_role = 'guest'
-    user_id = guest['nama'] + "-" + guest['meja']
-
-    # Ambil pesanan berdasarkan user_id tamu
-    belum_dibayar = list(sales_collection.find({'user_id': user_id, 'status': 'belum dibayar'}))
-    menunggu_konfirmasi = list(sales_collection.find({'user_id': user_id, 'status': 'menunggu konfirmasi'}))
-    proses = list(sales_collection.find({'user_id': user_id, 'status': 'proses'}))
-    selesai = list(sales_collection.find({'user_id': user_id, 'status': 'selesai'}))
-
-    # Ambil semua review (opsional: filter berdasarkan user_id atau order_number)
-    reviews = reviews_collection.find()
-    reviews_dict = {}
-    for review in reviews:
-        order_number = review['order_number']
-        if order_number in reviews_dict:
-            reviews_dict[order_number].append(review)
-        else:
-            reviews_dict[order_number] = [review]
-
-    review = None
-    if reviews_dict:
-        review = reviews_dict[next(iter(reviews_dict))][0]
-
-    return render_template("pesanan.html",
-                           user=guest,
-                           user_role=user_role,
-                           belum_dibayar=belum_dibayar,
-                           menunggu_konfirmasi=menunggu_konfirmasi,
-                           proses=proses,
-                           selesai=selesai,
-                           reviews_dict=reviews_dict,
-                           review=review)
-
 
 @app.route('/')
 def index():
@@ -657,6 +358,300 @@ def detailMenu(menu_id):
 def tentang():
     user_role = get_user_role()
     return render_template("tentang.html", user_role=user_role)
+
+@app.route("/pesanan")
+@token_required
+def pesanan(current_user):
+    user_role = get_user_role()
+    user_id = current_user['_id']
+    belum_dibayar = list(sales_collection.find({'user_id': user_id, 'status': 'belum dibayar'}))
+    menunggu_konfirmasi = list(sales_collection.find({'user_id': user_id, 'status': 'menunggu konfirmasi'}))
+    proses = list(sales_collection.find({'user_id': user_id, 'status': 'proses'}))
+    selesai = list(sales_collection.find({'user_id': user_id, 'status': 'selesai'}))
+
+    # Fetch reviews and organize into reviews_dict
+    reviews = reviews_collection.find()
+    reviews_dict = {}
+    for review in reviews:
+        order_number = review['order_number']
+        if order_number in reviews_dict:
+            reviews_dict[order_number].append(review)
+        else:
+            reviews_dict[order_number] = [review]
+
+    # Assuming you want to pass the first review in reviews_dict (adjust as per your logic)
+    review = None
+    if reviews_dict:
+        review = reviews_dict[next(iter(reviews_dict))][0]  # Get the first review from the first order in reviews_dict
+
+    return render_template("pesanan.html", user=current_user, user_role=user_role,
+                           belum_dibayar=belum_dibayar, menunggu_konfirmasi=menunggu_konfirmasi,
+                           proses=proses, selesai=selesai, reviews_dict=reviews_dict, review=review)
+
+@app.route("/bayar")
+@token_required
+def bayar(current_user):
+    user_role = get_user_role()
+    return render_template("pembayaran.html", user=current_user, user_role=user_role)
+
+@app.route('/keranjang')
+#@token_required
+@guest_required
+def keranjang(current_user):
+    guest = session.get('guest_info')
+    user_role = get_user_role()
+    carts = carts_collection.find({'user_id': current_user['_id']}).sort('created_at', DESCENDING)
+    cart_items = list(carts)
+    # Ensure all prices and quantities are integers
+    for item in cart_items:
+        item['hargamenu'] = int(item['hargamenu'])
+        item['quantity'] = int(item['quantity'])
+        item['checked'] = True  # Set 'checked' field to True for rendering checkbox as checked
+    return render_template("keranjang.html", user=current_user, user_role=user_role, cart_items=cart_items)
+
+@app.route('/keranjang/<menu_id>', methods=['POST'])
+@token_required
+def add_to_cart(current_user, menu_id):
+    user_role = get_user_role()
+    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
+    
+    if menu:
+        existing_cart_item = carts_collection.find_one({
+            'user_id': current_user['_id'],
+            'menu_id': menu['_id']
+        })
+        
+        if existing_cart_item:
+            new_quantity = existing_cart_item['quantity'] + 1
+            carts_collection.update_one(
+                {'_id': existing_cart_item['_id']},
+                {'$set': {'quantity': new_quantity}}
+            )
+            flash('Jumlah item di keranjang diperbarui', 'success')
+        else:
+            quantity = request.form.get('quantity', default=1, type=int)
+            cart_item = {
+                'user_id': current_user['_id'],
+                'menu_id': menu['_id'],
+                'quantity': quantity,
+                'namamenu': menu['namamenu'],
+                'hargamenu': menu['hargamenu'],
+                'fotomenu': menu['fotomenu'],
+                'created_at': datetime.now(),
+            }
+            carts_collection.insert_one(cart_item)
+            flash('Menu ditambahkan ke keranjang', 'success')
+    else:
+        flash('Menu tidak ditemukan', 'danger')
+    
+    return redirect(url_for('menu'))
+
+@app.route('/update_quantity/<item_id>', methods=['POST'])
+@token_required
+def update_quantity(current_user, item_id):
+    data = request.get_json()
+    action = data.get('action')
+    item = carts_collection.find_one({'_id': ObjectId(item_id), 'user_id': current_user['_id']})
+    
+    if item:
+        if action == 'increase':
+            new_quantity = item['quantity'] + 1
+        elif action == 'decrease' and item['quantity'] > 1:
+            new_quantity = item['quantity'] - 1
+        else:
+            return jsonify({'success': False, 'message': 'Invalid action or quantity cannot be less than 1'})
+
+        carts_collection.update_one({'_id': ObjectId(item_id)}, {'$set': {'quantity': new_quantity}})
+        return jsonify({'success': True, 'new_quantity': new_quantity})
+    else:
+        return jsonify({'success': False, 'message': 'Item not found in cart'})
+
+@app.route('/delete_item/<item_id>', methods=['DELETE'])
+@token_required
+def delete_item(current_user, item_id):
+    result = carts_collection.delete_one({'_id': ObjectId(item_id), 'user_id': current_user['_id']})
+    if result.deleted_count == 1:
+        return jsonify({'success': True, 'message': 'Item berhasil dihapus'}), 200
+    else:
+        return jsonify({'success': False, 'message': 'Item tidak ditemukan'}), 404
+
+@app.route('/cart_count', methods=['GET'])
+@token_required
+def cart_count(current_user):
+    # Mengambil user_id dari current_user yang diambil dari token
+    user_id = current_user['_id']
+    if not user_id:
+        return jsonify({'error': 'user_id is required'}), 400
+
+    # Menghitung jumlah dokumen/item dalam koleksi yang sesuai dengan user_id
+    total_items = carts_collection.count_documents({'user_id': user_id})
+
+    return jsonify({'total_items': total_items})
+
+@app.route('/checkout/<menu_id>', methods=['POST'])
+@token_required
+def direct_checkout(current_user, menu_id):
+    menu = menus_collection.find_one({'_id': ObjectId(menu_id)})
+    if menu:
+        # Langsung proses checkout untuk item yang dipilih
+        return redirect(url_for('checkout', menu_id=menu_id))
+    else:
+        flash('Menu tidak ditemukan', 'danger')
+        return redirect(url_for('menu'))
+
+def validate_cart_items(cart_items):
+    for item in cart_items:
+        try:
+            item['hargamenu'] = float(item['hargamenu'])
+            item['quantity'] = int(item['quantity'])
+        except ValueError:
+            return False
+    return True
+
+@app.route("/checkout", methods=['GET', 'POST'])
+@token_required
+def checkout(current_user):
+    user_role = get_user_role()
+    if request.method == 'POST':
+        cart_items = list(carts_collection.find({'user_id': current_user['_id']}))
+        if not validate_cart_items(cart_items):
+            flash('Invalid data in cart items.', 'danger')
+            return redirect(url_for('index'))
+
+        total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
+        
+        payment_method = 'midtrans'
+        #payment_method = request.form.get('metode_pembayaran')
+        #if not payment_method:
+         #   flash('Pilih metode pembayaran terlebih dahulu.', 'danger')
+          #  return redirect(url_for('checkout'))
+        
+        order_number = generate_order_number(current_user['nama'])
+        sales_data = {
+            'user_id': current_user['_id'],
+            'user_name': current_user['nama'],
+            'order_number': order_number,
+            'order_date': datetime.now(),
+            'items': cart_items,
+            'total_amount': total_amount,
+            'payment_method': request.form['metode_pembayaran'],
+            'status':'belum dibayar'
+        }
+
+        sales_collection.insert_one(sales_data)
+        carts_collection.delete_many({'user_id': current_user['_id']})
+
+        flash('Pesanan berhasil dibuat, silahkan melakukan pembayaran!', 'success')
+        return redirect(url_for('payment', order_number=order_number))
+    else:
+        cart_items = list(carts_collection.find({'user_id': current_user['_id']}))
+        if not validate_cart_items(cart_items):
+            flash('Invalid data in cart items.', 'danger')
+            return redirect(url_for('index'))
+
+        total_amount = sum(item['hargamenu'] * item['quantity'] for item in cart_items)
+        return render_template("checkout.html", user=current_user, user_role=user_role, cart_items=cart_items, total_amount=total_amount)
+
+logging.basicConfig(level=logging.INFO,  # Atau logging.DEBUG untuk detail lebih
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+@app.route('/payment/<order_number>', methods=['GET'])
+@token_required
+def payment(current_user, order_number):
+    try:
+        logging.info(f"Memproses pembayaran untuk Order Number: {order_number}")
+        order = sales_collection.find_one({'order_number': order_number, 'user_id': current_user['_id']})
+
+        if not order:
+            logging.warning(f"Order dengan nomor {order_number} tidak ditemukan.")
+            flash('Order tidak ditemukan.', 'danger')
+            return redirect(url_for('pesanan'))  # Atau halaman lain yang sesuai
+
+        # Validasi data order
+        if not isinstance(order['total_amount'], (int, float)):
+            logging.error(f"Total amount tidak valid: {order['total_amount']}")
+            flash('Invalid order amount.', 'danger')
+            return redirect(url_for('index'))
+
+        transaction = {
+            'transaction_details': {
+                'order_id': order['order_number'],
+                'gross_amount': int(order['total_amount']),  # Pastikan integer
+            },
+            'customer_details': {
+                'first_name': current_user.get('nama', ''),  # Gunakan 'nama' dari user
+                'email': current_user.get('email', '')
+            }
+        }
+
+        logging.info(f"Data transaksi Midtrans: {transaction}")
+
+        snap_response = snap.create_transaction(transaction)
+        logging.info(f"Respons dari Midtrans: {snap_response}")
+
+        if snap_response.get('token'):  # Periksa keberadaan token
+            snap_token = snap_response['token']
+            logging.info(f"Snap Token yang dibuat: {snap_token}")
+            return render_template('pembayaran.html', order=order, user=current_user, snap_token=snap_token)
+        else:
+            logging.error(f"Gagal mendapatkan token dari Midtrans: {snap_response}")
+            flash('Gagal membuat token pembayaran. Silakan coba lagi.', 'danger')
+            return redirect(url_for('pesanan'))
+
+    except midtransclient.MidtransAPIError as e:  # Tangkap exception Midtrans
+        logging.error(f"Error Midtrans: {e.raw_json}")
+        flash(f'Terjadi kesalahan saat memproses pembayaran: {e.raw_json}', 'danger')
+        return redirect(url_for('pesanan'))
+
+    except Exception as e:
+        logging.exception(f"Error saat memproses pembayaran untuk Order Number {order_number}: {e}")
+        flash(f'Terjadi kesalahan saat memproses pembayaran: {e}', 'danger')
+        return redirect(url_for('pesanan'))
+
+
+@app.route('/finish')  # Contoh route finish
+def finish_payment():
+    logging.info("Masuk ke route /finish")
+    logging.info(f"Data dari Midtrans: {request.args}")  # Log data GET
+    transaction_status = request.args.get('transaction_status')
+    order_id = request.args.get('order_id')
+    try:
+        logging.info(f"Memproses status transaksi: {transaction_status} untuk Order ID: {order_id}")
+        order = sales_collection.find_one({'order_number': order_id})
+        if not order:
+            logging.warning(f"Order dengan nomor {order_id} tidak ditemukan di database.")
+            flash('Order tidak ditemukan.', 'danger')
+            return redirect(url_for('pesanan'))  # Atau halaman yang sesuai
+
+        if transaction_status == 'capture' or transaction_status == 'settlement':
+            # Pembayaran berhasil
+            sales_collection.update_one(
+                {'order_number': order_id},
+                {'$set': {'status': 'menunggu konfirmasi'}}  # Atau 'dibayar', sesuaikan dengan alur Anda
+            )
+            logging.info(f"Status order {order_id} diperbarui menjadi 'menunggu konfirmasi'")
+            flash('Pembayaran berhasil. Menunggu konfirmasi dari penjual.', 'success')
+        elif transaction_status == 'pending':
+            logging.info(f"Pembayaran untuk order {order_id} masih pending.")
+            flash('Pembayaran pending. Menunggu konfirmasi dari bank.', 'warning')
+        elif transaction_status == 'deny' or transaction_status == 'expire' or transaction_status == 'cancel':
+            # Pembayaran gagal
+            sales_collection.update_one(
+                {'order_number': order_id},
+                {'$set': {'status': 'gagal'}}
+            )
+            logging.warning(f"Pembayaran untuk order {order_id} gagal.")
+            flash('Pembayaran gagal.', 'danger')
+        else:
+            logging.warning(f"Status transaksi tidak dikenal: {transaction_status}")
+            flash(f'Status transaksi tidak dikenal: {transaction_status}', 'warning')
+
+        return redirect(url_for('pesanan'))  # Redirect ke halaman pesanan atau halaman detail order
+
+    except Exception as e:
+        logging.error(f"Error dalam /finish: {e}", exc_info=True)
+        flash(f'Terjadi kesalahan saat memproses pembayaran: {e}', 'danger')
+        return redirect(url_for('index'))
 
 
 @app.route('/upload_bukti_pembayaran/<order_number>', methods=['POST'])

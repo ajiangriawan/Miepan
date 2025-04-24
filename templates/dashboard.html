@@ -1,8 +1,5 @@
-{% extends 'sidenav.html' %}
-
-{% block title %} Dashboard {% endblock %}
-
-{% block content %}
+{% extends 'baseadmin.html' %} {% block title %} Dashboard {% endblock %} {% block
+content %}
 <!-- Main Content -->
 <div class="container text-center mb-5">
   <div class="container text-start mt-5">
@@ -66,9 +63,7 @@
                 <div class="col-md-3 d-flex justify-content-start">
                   {{ order['order_number'] }}
                 </div>
-                <div class="col-md-3">
-                  {{ order['total_amount']|rupiah }}
-                </div>
+                <div class="col-md-3">{{ order['total_amount']|rupiah }}</div>
               </div>
             </div>
           </div>
@@ -95,9 +90,7 @@
     <br />
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 {% endblock %}
