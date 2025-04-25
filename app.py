@@ -40,8 +40,8 @@ app.secret_key = os.environ.get("SECRET_KEY")
 # Konfigurasi Midtrans
 snap = midtransclient.Snap(
     is_production=False,
-    server_key='SB-Mid-server-JXRpAuUv6DPPtc_J6EI1j2K5',
-    client_key='SB-Mid-client-dSgDuAoxFydvJJbN'
+    server_key='#',
+    client_key='#'
 )
 
 
